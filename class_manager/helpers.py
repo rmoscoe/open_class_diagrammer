@@ -7,3 +7,12 @@ def flatten_dict(original_dict, parent_key=""):
         else:
             items.append((new_key, value))
     return dict(items)
+
+def prepare_dict_for_form(subdict):
+    choices = []
+    for key, value in subdict.items():
+        if isinstance(value, dict):
+            choices.append((key, prepare_dict_for_form(value)))  # Grouping by key
+        else:
+            choices.append((key, value))  # Individual choice
+    return choices

@@ -12,7 +12,7 @@ DATA_TYPE_CHOICES = {
     "Any": "Any",
     "Primitives": {
         "Boolean": "Boolean",
-        "Number": {
+        "Numeric": {
             "Number": "Number",
             "Integer": "Integer",
             "Double": "Double",
@@ -118,7 +118,7 @@ class Property(BaseAttribute):
     data_type = models.CharField(max_length=255, null=True, blank=True)
 
     def get_data_type_display(self):
-        selected_types = self.data_type.split(",")
+        selected_types = self.data_type.split(" | ")
         flattened_choices = flatten_dict(DATA_TYPE_CHOICES)
         return " | ".join(flattened_choices.get(choice, choice) for choice in selected_types)
 
@@ -129,4 +129,4 @@ class Method(BaseAttribute):
 class Relationship(Model):
     from_model = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="from_model")
     to_model = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="to_model")
-    relationship_type = get_relationship_type_choices
+    relationship_type = models.CharField(max_length=80, choices=get_relationship_type_choices)
