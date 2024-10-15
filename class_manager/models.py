@@ -1,8 +1,6 @@
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import F, Q
 from django.db.models import Model
 from .helpers import flatten_dict
 import uuid
