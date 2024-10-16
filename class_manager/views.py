@@ -16,6 +16,7 @@ from django.views.generic import ListView, DetailView, FormView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import UserForm, ProjectForm, ModuleForm, ClassForm, PropertyForm, MethodForm, RelationshipForm
+from .helpers import build_color_theme
 import json
 from .models import *
 import os
@@ -198,7 +199,7 @@ DEFAULT_COLORS = {
 
 
 #================================#
-#     MIXINS        #
+#             MIXINS             #
 #================================#
 
 class AnonymousUserMixin(UserPassesTestMixin):
@@ -453,3 +454,32 @@ class RelationshipUpdateView(LoginRequiredMixin, OCDDeleteMixin, UpdateView):
             return reverse("class-detail", kwargs={"pk": self.object.from_model.id})
         else:
             return reverse("relationship-detail", kwargs={"pk", self.object.id})
+        
+
+#================================#
+#          DIAGRAM VIEW          #
+#================================#
+
+class DiagramView(LoginRequiredMixin, TemplateView):
+    template_name = "class_manager/diagram.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project = Project.objects.prefetch_related(
+            "module_set",
+            "module_set__class_set",
+            "module_set__class_set__property_set",
+            "module_set__class_set__method_set",
+            "module_set__class_set__relationships"
+        ).get(id=self.kwargs["pk"])
+        context["project"] = project
+        colors = DEFAULT_COLORS.copy()
+        default_primary_colors = [color["primary_color"] for color in DEFAULT_COLORS]
+        counter = 1
+        for module in project.module_set:
+            if module.color not in default_primary_colors:
+                color = build_color_theme(module.color)
+                colors[f"custom_color_{counter}"] = color
+                counter += 1
+        context["colors"] = colors
+        return context
