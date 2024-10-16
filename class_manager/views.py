@@ -55,10 +55,10 @@ DEFAULT_COLORS = {
         "display_name": "Brown",
         "primary_color": "#854d0e",
         "content_color": "yellow-600",
-        "border_color": "creme", # "#f5e7d6"
+        "border_color": "cream",
         "dark_primary_color": "#713f12",
         "dark_content_color": "yellow-700",
-        "dark_border_color": "oatmeal" # "#f2dac0"
+        "dark_border_color": "oatmeal"
     },
     "red-600": {
         "display_name": "Red",

@@ -26,5 +26,6 @@ urlpatterns = [
     path("account/login", OpenClassDiagrammerLoginView.as_view(), name="login"),
     path("account/<pk>/update/", UserUpdateView.as_view(), name="account-update"),
     path("account/<pk>/details/", UserDetailView.as_view(), name="account-detail"),
-    path("workbench/", WorkbenchView.as_view(), name="workbench")
+    path("workbench/", WorkbenchView.as_view(), name="workbench"),
+    path("__reload__/", include("django_browser_reload.urls"))
 ]
