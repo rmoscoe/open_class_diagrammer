@@ -17,7 +17,7 @@
 
 	<body 
 		class="bg-white font-sans leading-normal tracking-normal dark:bg-slate-800 flex" 
-		x-data="{ sidebarState = 'closed' }" 
+		x-data="{ showSidebar: false }" 
 		x-init="() => {
 			if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');

@@ -16,6 +16,7 @@ Including another URLconf
 """
 from class_manager.views import HomePageView, SignupView, OpenClassDiagrammerLoginView, UserUpdateView, UserDetailView, WorkbenchView
 from django.contrib import admin
+from django.contrib.auth.views import LogoutView
 from django.urls import path, include
 
 urlpatterns = [
@@ -26,6 +27,7 @@ urlpatterns = [
     path("account/login", OpenClassDiagrammerLoginView.as_view(), name="login"),
     path("account/<pk>/update/", UserUpdateView.as_view(), name="account-update"),
     path("account/<pk>/details/", UserDetailView.as_view(), name="account-detail"),
+    path("logout/", LogoutView.as_view(), name="logout"),
     path("workbench/", WorkbenchView.as_view(), name="workbench"),
     path("__reload__/", include("django_browser_reload.urls"))
 ]

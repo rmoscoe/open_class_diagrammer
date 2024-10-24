@@ -1,5 +1,69 @@
 {% load static %}
 
-<aside class="p-2 sm:p-4 xl:py-4 xl:px-8" :class="sidebarState !== 'closed' && 'border-r border-slate-300 dark:border-slate-400">
-
+<aside class="relative p-2 sm:p-4 xl:py-4 xl:px-8" :class="showSidebar && 'top-0 bottom-0 left-0 border-r border-slate-300 dark:border-slate-400'">
+    <div class="flex w-full px-1 md:px-2 h-8 md:h-10 xl:h-12 items-center">
+        <button class="p-px" @click="showSidebar = !showSidebar">
+            <i class="fa-solid fa-bars transition-transform duration-300 h-8 w-8" :class="showSidebar && 'rotate-90'"></i>
+        </button>
+    </div>
+    <nav x-show="showSidebar" x-data="{ sidebarExpanded: true }" class="px-1 md:px-2 w-8 flex justify-center flex-wrap space-y-2" :class="sidebarExpanded && 'md:w-48 lg:w-56'">
+        <div class="flex items-start justify-center bg-slate-300 dark:bg-slate-950">
+            <button class="w-full p-1 flex justify-end hover:bg-blue-200 dark:hover:bg-violet-300 active:bg-blue-300 focus:bg-blue-200 dark:active:bg-violet-400 dark:focus:bg-violet-300">
+                |
+                <i class="fa-solid fa-angles-right transition-transform duration-300 h-4 w-4" :class="sidebarExpanded && rotate-180"></i>
+            </button>
+        </div>
+        <div class="h-0.5 bg-slate-500 rounded w-full"></div>
+        <a href="{% if user.is_authenticated %}{% url 'workbench' %}{% else %}{% url 'home' %}{% endif %}" :class="sidebarExpanded && 'justify-between'">
+            <i class="fa-solid fa-house"></i>
+            <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Home</span>
+        </a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'class_manager:project-list' %}" :class="sidebarExpanded && 'justify-between'">
+            <i class="fa-solid fa-list-check"></i>
+            <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Projects</span>
+        </a>
+        <a href="{% url 'class_manager:module-list' %}" :class="sidebarExpanded && 'justify-between'">
+            <i class="fa-solid fa-robot"></i>
+            <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Modules</span>
+        </a>
+        <a href="{% url 'class_manager:class-list' %}" :class="sidebarExpanded && 'justify-between'">
+            <i class="fa-solid fa-shapes"></i>
+            <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Classes</span>
+        </a>
+        <a href="{% url 'class_manager:property-list' %}" :class="sidebarExpanded && 'justify-between'">
+            <i class="fa-solid fa-arrows-to-dot"></i>
+            <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Properties</span>
+        </a>
+        <a href="{% url 'class_manager:method-list' %}" :class="sidebarExpanded && 'justify-between'">
+            <i class="fa-solid fa-rocket"></i>
+            <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Methods</span>
+        </a>
+        {% endif %}
+        <div class="h-0.5 bg-slate-500 rounded w-full"></div>
+        <button class="w-full p-1 flex justify-center hover:bg-blue-200 dark:hover:bg-violet-300 active:bg-blue-300 focus:bg-blue-200 dark:active:bg-violet-400 dark:focus:bg-violet-300" @click="const currentTheme = localStorage.getItem('theme'); if (currentTheme === 'light') {localStorage.setItem('theme', 'dark')} else {localStorage.setItem('theme', 'light')}; dodument.documentElement.classList.toggle('dark')">
+            <span x-show="sidebarExpanded" class="mr-2">Toggle Theme</span>
+            <i class="fa-solid fa-circle-half-stroke text-slate-700 dark:hidden"></i>
+            <i class="fa-solid fa-sun hidden dark:inline-block text-yellow-400"></i>
+        </button>
+        {% if user.is_authenticated %}
+        <a href="{% url 'account-update' pk=user.id %}" :class="sidebarExpanded && 'justify-between'">
+            <i class="fa-solid fa-user"></i>
+            <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Account</span>
+        </a>
+        <a href="{% url 'logout' %}" :class="sidebarExpanded && 'justify-between'">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Log Out</span>
+        </a>
+        {% else%}
+        <a href="{% url 'login' %}" :class="sidebarExpanded && 'justify-between'">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Log In</span>
+        </a>
+        <a href="{% url 'register' %}" :class="sidebarExpanded && 'justify-between'">
+            <i class="fa-solid fa-user-plus"></i>
+            <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Register</span>
+        </a>
+        {% endif %}
+    </nav>
 </aside>

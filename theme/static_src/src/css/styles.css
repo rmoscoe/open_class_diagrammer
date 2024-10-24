@@ -163,3 +163,14 @@ td > a {
 .header {
     @apply px-2 py-3 font-semibold text-white dark:text-black w-24 sm:w-32 md:w-40 xl:w-48 3xl:w-52 shadow-sm;
 }
+
+
+/* NAV */
+
+nav > a {
+    @apply w-full p-1 flex justify-center hover:bg-blue-200 dark:hover:violet-300 active:bg-blue-300 focus:bg-blue-200 dark:active:bg-violet-400 dark:focus:bg-violet-300 group;
+}
+
+nav > a > i {
+    @apply text-blue-700 dark:text-violet-600 h-6 w-6 group-hover:text-blue-600 group-hover:dark:text-violet-500;
+}
