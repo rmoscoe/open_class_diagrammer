@@ -2,19 +2,37 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-    	<title>Django Tailwind</title>
+    	<title>Open Class Diagrammer</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<meta name="description" content="Enter the details for the classes in your project, and Open Class Diagrammer will create a UML diagram for you, letting you visualize class relationships.">
+		<link rel="icon" type=image/x-icon href="{% static 'images/icons/favicon.ico' %}">
+        <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'fontawesomefree/css/regular.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
 		<script src="{% static 'js/app.js' %}" defer></script>
 		{% tailwind_css %}
 	</head>
 
-	<body class="bg-gray-50 font-serif leading-normal tracking-normal">
-		<div class="container mx-auto">
-			<section class="flex items-center justify-center h-screen">
-				<h1 class="text-5xl">Django + Tailwind = ❤️</h1>
-			</section>
-		</div>
+	<body 
+		class="bg-white font-sans leading-normal tracking-normal dark:bg-slate-800 flex" 
+		x-data="{ sidebarState = 'closed' }" 
+		x-init="() => {
+			if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+			if (window.innerWidth >= 768) {
+				sidebarState = 'open';
+			}
+		}"
+	>
+		{% include "./partials/sidebar.html" %}
+		<main class="grow">
+			{% include "./partials/header.html" %}
+			{% block page %}
+		</main>
 	</body>
 </html>

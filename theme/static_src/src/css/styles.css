@@ -1,3 +1,165 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    @apply bg-white text-slate-600 font-serif text-base dark:bg-slate-800 dark:text-slate-300;
+}
+
+
+/* HEADINGS */
+
+h1 {
+    @apply text-3xl md:text-4xl text-slate-800 font-sans font-bold dark:text-slate-50;
+}
+
+h2 {
+    @apply text-xl md:text-2xl text-slate-800 font-sans font-bold dark:text-slate-50;
+}
+
+h3 {
+    @apply text-xl md:text-2xl text-slate-700 font-semibold dark:text-slate-100;
+}
+
+h4 {
+    @apply text-lg md:text-xl text-slate-700 font-semibold dark:text-slate-100;
+}
+
+h5 {
+    @apply md:text-lg font-semibold dark:text-slate-200;
+}
+
+h6 {
+    @apply font-bold font-sans;
+}
+
+
+/* FORM CONTROLS */
+
+.btn {
+    @apply block px-3 py-2 rounded-md font-semibold cursor-pointer text-center shadow-md disabled:pointer-events-none disabled:cursor-not-allowed text-slate-600 dark:text-slate-300 focus:border-2 w-full sm:w-36 md:w-44 lg:w-52 xl:w-56;
+}
+
+.btn-square {
+    @apply flex px-2 py-2 rounded-sm font-semibold cursor-pointer items-center justify-center text-center shadow-md disabled:pointer-events-none disabled:cursor-not-allowed text-slate-600 dark:text-slate-300 focus:border-2 w-8 h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 2xl:w-12 2xl:h-12;
+}
+
+.btn.green, .btn-square.green {
+    @apply bg-green-500 dark:bg-green-600 hover:bg-green-600 focus:border-green-200 disabled:bg-green-300 dark:text-slate-300 dark:hover:bg-green-700 dark:focus:border-green-300 dark:disabled:bg-green-400 active:bg-green-600 dark:active:bg-green-700;
+}
+
+.btn.red, .btn-square.red {
+    @apply bg-red-500 dark:bg-red-600 hover:bg-red-600 focus:border-red-200 disabled:bg-red-300 dark:text-slate-300 dark:hover:bg-red-700 dark:focus:border-red-300 dark:disabled:bg-red-400 active:bg-red-600 dark:active:bg-red-700;
+}
+
+.btn.blue, .btn-square.blue {
+    @apply bg-blue-700 dark:bg-blue-600 hover:bg-blue-600 focus:border-blue-200 disabled:bg-blue-300 dark:text-slate-300 dark:hover:bg-blue-500 dark:focus:border-blue-300 dark:disabled:bg-blue-400 active:bg-blue-800 dark:active:bg-blue-700;
+}
+
+.btn.violet, .btn-square.violet {
+    @apply bg-violet-700 dark:bg-violet-600 hover:bg-violet-600 focus:border-violet-200 disabled:bg-violet-300 dark:text-slate-300 dark:hover:bg-violet-500 dark:focus:border-violet-300 dark:disabled:bg-violet-400 active:bg-violet-800 dark:active:bg-violet-700;
+}
+
+input, select, textarea {
+    @apply static rounded-lg border border-slate-400 dark:border-slate-500 placeholder-slate-400 disabled:bg-slate-300 dark:disabled:bg-slate-600 focus:ring-blue-700 dark:focus:ring-violet-600 disabled:pointer-events-none disabled:cursor-not-allowed bg-white dark:bg-slate-900 w-full;
+}
+
+input[required], textarea[required], select[required] {
+    @apply border-slate-400 dark:border-slate-500 focus:ring-blue-700 dark:focus:ring-violet-600 ;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(60%) saturate(100%);
+}
+
+input.invalid, textarea.invalid, select.invalid {
+    @apply border-red-700 dark:border-red-600;
+}
+
+input, textarea {
+    @apply cursor-text focus:caret-blue-700 dark:focus:caret-violet-600;
+}
+
+input.invalid, textarea.invalid {
+    @apply caret-red-700 dark:caret-red-600;
+}
+
+select {
+    @apply cursor-pointer;
+}
+
+textarea {
+    @apply resize;
+}
+
+option {
+    @apply text-sm;
+}
+
+label {
+    @apply text-xs md:text-sm block;
+}
+
+form > div {
+    @apply mx-auto inline-block static w-full;
+}
+
+ul.errorlist {
+    @apply list-disc text-red-700 dark:text-red-600 text-xs md:text-sm ml-4;
+    list-style-position:inside;
+}
+
+.helptext {
+    @apply ml-2 md:ml-3 xl:ml-4 text-blue-700 dark:text-violet-600 flex-wrap;
+}
+
+.form-grid {
+    @apply grid grid-cols-1 gap-4 lg:gap-6;
+}
+
+fieldset {
+    @apply border-slate-400 p-2 border-2;
+    border-style:groove;
+}
+
+
+/* TABLES */
+
+table {
+    @apply border-collapse border border-slate-400 dark:border-slate-500 border-spacing-0 table-auto;
+}
+
+thead {
+    @apply font-semibold bg-slate-200 dark:bg-slate-700;
+}
+
+tr {
+    @apply border-t border-t-slate-400 dark:border-t-slate-500 p-1 sm:p-2 lg:p-3
+}
+
+th, td {
+    @apply sm:px-1 md:px-2 xl:px-3;
+}
+
+td.link {
+    @apply px-0;
+}
+
+td > a {
+    @apply sm:px-1 md:px-2;
+}
+
+
+/* DIAGRAM */
+
+.class {
+    @apply shadow-sm dark:shadow-slate-300/80;
+}
+
+.cell {
+    @apply p-2 w-24 sm:w-32 md:w-40 xl:w-48 3xl:w-52 h-16 sm:h-20 md:h-24 xl:h-28 3xl:h-32 lg:text-lg 2xl:text-xl text-slate-800 dark:text-slate-100;
+}
+
+.header {
+    @apply px-2 py-3 font-semibold text-white dark:text-black w-24 sm:w-32 md:w-40 xl:w-48 3xl:w-52 shadow-sm;
+}

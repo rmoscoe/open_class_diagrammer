@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     "class_manager",
     "tailwind",
     "theme",
-    "django_browser_reload"
+    "django_browser_reload",
+    "fontawesomefree"
 ]
 
 MIDDLEWARE = [
