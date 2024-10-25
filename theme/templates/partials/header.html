@@ -1,0 +1,8 @@
+{% load static %}
+
+<header class="flex items-center py-2 h-8 md:h-10 xl:h-12 space-x-4 w-full border-b border-slate-300 dark:border-slate-400">
+    <a href="{% if user.is_authenticated %}{% url 'workbench' %}{% else %}{% url 'home' %}{% endif %}">
+        <img src="{% static 'images/logo.png'}" alt="logo in the shape of a class diagram" class="h-6 w-6 md:h-8 md:w-8 xl:h-10 xl:w-10" />
+    </a>
+    {% block heading %}<h1>Open Class Diagrammer</h1>{% endblock %}
+</header>

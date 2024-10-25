@@ -1,6 +1,6 @@
 {% load static %}
 
-<aside class="relative p-2 sm:p-4 xl:py-4 xl:px-8" :class="showSidebar && 'top-0 bottom-0 left-0 border-r border-slate-300 dark:border-slate-400'">
+<aside class="relative p-2 sm:p-4 md:p-2 xl:py-4 xl:px-8" :class="showSidebar && 'top-0 bottom-0 left-0 border-r border-slate-300 dark:border-slate-400'">
     <div class="flex w-full px-1 md:px-2 h-8 md:h-10 xl:h-12 items-center">
         <button class="p-px" @click="showSidebar = !showSidebar">
             <i class="fa-solid fa-bars transition-transform duration-300 h-8 w-8" :class="showSidebar && 'rotate-90'"></i>
