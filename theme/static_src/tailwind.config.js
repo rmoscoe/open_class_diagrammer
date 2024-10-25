@@ -46,6 +46,9 @@ module.exports = {
             colors: {
                 "cream": "#f5e7d6",
                 "oatmeal": "#f2dac0"
+            },
+            screens: {
+                "3xl": "2064px"
             }
         },
     },

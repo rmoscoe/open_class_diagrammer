@@ -68,7 +68,7 @@ ROOT_URLCONF = 'open_class_diagrammer.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'theme/templates'), os.path.join(BASE_DIR, 'class_manager/templates/class_manager')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

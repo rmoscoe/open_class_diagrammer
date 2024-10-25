@@ -1,0 +1,40 @@
+{% extends "theme/templates/base.html" %}
+{% load static %}
+
+{% block page %}
+<section>
+    <section class="relative w-full h-40 sm:h-48 md:h-56 lg:h-72 xl:h-96 2xl:h-[28rem] 3xl:h-[32rem]">
+        <img src="{% static 'images/temp_hero.png' %}" alt="A colorful UML class diagram" class="w-full my-auto" />
+        <div class="absolute flex justify-between items-center w-1/2 sm:w-1/3 md:w-2/5 lg:w-1/3 xl:w/1/4 2xl:w-1/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+            <a href="{% url 'login' %}" class="btn blue dark:violet">Log In</a>
+            <a href="{% url 'register' %}" class="btn blue dark:violet">Register</a>
+        </div>
+    </section>
+    <section class="m-4 md:m-5 lg:m-6 2xl:m-8 w-full text-lg lg:text-2xl space-y-2 md:space-y-3 lg:space-y-4">
+        <p class="font-bold font-sans">Welcome to Open Class Diagrammer | Craft Your Class Diagrams with Precision and Ease</p>
+        <p>Say goodbye to messy, static diagrams and welcome a seamless, dynamic way to design your system architectures. <span class="font-semibold">Open Class Diagrammer</span> is your all-in-one solution for creating UML and Entity-Relationship diagrams that bring clarity to complex designs, making it easier than ever to visualize your data models, class structures, and their interconnections.</p>
+        <h2>Why Choose Open Class Diagrammer?</h2>
+        <ul class="list-disc">
+            <li>
+                <p class="font-bold">Hybrid Diagramming for True Versatility</p>
+                <p>Open Class Diagrammer combines the best of UML class diagrams with the power of ER diagrams, allowing you to capture both <span class="font-semibold">inheritance</span> and <span class="font-semibold">associative relationships</span> (one-to-one, one-to-many, and many-to-many) within a single, cohesive layout.</p>
+            </li>
+            <li>
+                <p class="font-bold">Intelligent Layout for Effortless Clarity</p>
+                <p>Powered by a sophisticated force-directed layout, Open Class Diagrammer dynamically organizes your diagrams, ensuring that related classes and entities remain close, while unrelated ones stay out of the way. No more tangled connectors or overlapping classes—just clean, readable diagrams every time.</p>
+            </li>
+            <li>
+                <p class="font-bold">Precision Styling and Routing</p>
+                <p>Customize each class to fit your style with extensive design options, from fonts and colors to borders and backgrounds. Plus, with <span class="font-semibold">orthogonal routing</span>, all your connectors follow neat, right-angle paths that enhance readability, minimize visual clutter, and keep your design polished and professional.
+            </li>
+        </ul>
+        <br/>
+        <h2>Unleash the Power of Open Class Diagrammer</h2>
+        <p>Whether you're planning a database, designing software architecture, or refining a complex data model, Open Class Diagrammer adapts to your needs and grows with your project. It’s intuitive, visually appealing, and, best of all, designed to streamline your workflow.</p>
+        <p>
+            <a href="{% url 'register' %}" class="font-semibold text-blue-700 dark:text-violet-600 hover:underline hover:text-blue-600 dark:hover:text-violet-500">Get Started Today</a>
+            &nbsp;and see how Open Class Diagrammer transforms diagramming into a seamless, inspiring experience for designers, engineers, and developers alike.
+        </p>
+    </section>
+</section>
+{% endblock %}
