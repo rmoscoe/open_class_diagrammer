@@ -7,17 +7,17 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
 		<meta name="description" content="Enter the details for the classes in your project, and Open Class Diagrammer will create a UML diagram for you, letting you visualize class relationships.">
+		{% tailwind_css %}
 		<link rel="icon" type=image/x-icon href="{% static 'images/icons/favicon.ico' %}">
         <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
         <link href="{% static 'fontawesomefree/css/regular.css' %}" rel="stylesheet" type="text/css">
         <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
-		<script src="{% static 'js/app.js' %}" defer></script>
-		{% tailwind_css %}
+		<script type="module" src="{% static 'js/app.js' %}" defer></script>
 	</head>
 
 	<body 
-		class="bg-white font-sans leading-normal tracking-normal dark:bg-slate-800 flex" 
-		x-data="{ showSidebar: false }" 
+		class="bg-white font-sans leading-normal tracking-normal dark:bg-slate-800" 
+		x-data="{ showSidebar: false, sidebarExpanded: false }" 
 		x-init="() => {
 			if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
@@ -29,10 +29,10 @@
 			}
 		}"
 	>
-		{% include "./partials/sidebar.html" %}
-		<main class="grow">
-			{% include "./partials/header.html" %}
-			{% block page %}
+		{% include "./partials/header.html" %}
+		<main class="flex">
+			{% include "./partials/sidebar.html" %}
+			{% block page %}{% endblock %}
 		</main>
 	</body>
 </html>

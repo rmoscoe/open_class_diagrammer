@@ -171,7 +171,7 @@ STATIC_ROOT = f"{BASE_DIR}/static"
 
 STATICFILES_DIRS = [
     "class_manager/static",
-    "theme/static"
+    "theme/static_src/src"
 ]
 
 # Default primary key field type

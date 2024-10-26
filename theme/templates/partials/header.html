@@ -1,8 +1,17 @@
 {% load static %}
 
-<header class="flex items-center py-2 h-8 md:h-10 xl:h-12 space-x-4 w-full border-b border-slate-300 dark:border-slate-400">
-    <a href="{% if user.is_authenticated %}{% url 'workbench' %}{% else %}{% url 'home' %}{% endif %}">
-        <img src="{% static 'images/logo.png'}" alt="logo in the shape of a class diagram" class="h-6 w-6 md:h-8 md:w-8 xl:h-10 xl:w-10" />
-    </a>
-    {% block heading %}<h1>Open Class Diagrammer</h1>{% endblock %}
+<header class="flex items-center w-full">
+    <div class="flex h-10 sm:h-12 md:h-14 w-14 px-1 md:px-2 ml-px items-center border-r border-slate-300 transition-[width] duration-300" :class="showSidebar && sidebarExpanded ? 'md:w-52 lg:w-60' : !showSidebar && 'border-b'">
+        <button class="flex justify-center items-center my-auto" @click="showSidebar = !showSidebar">
+            <i class="fa-solid fa-bars transition-transform duration-300 h-4 w-8 mx-auto my-auto" :class="showSidebar && 'rotate-90'"></i>
+        </button>
+    </div>
+    <div class="flex border-b border-slate-300 dark:border-slate-400 items-center h-full min-h-10 sm:min-h-12 md:min-h-14 grow">
+        <div class="px-4">
+            <a href="{% if user.is_authenticated %}{% url 'workbench' %}{% else %}{% url 'home' %}{% endif %}">
+                <img src={% static 'images/logo.png' %} alt="logo in the shape of a class diagram" class="h-6 w-6 md:h-8 md:w-8 xl:h-10 xl:w-10" />
+            </a>
+        </div>
+        {% block heading %}<h1>Open Class Diagrammer</h1>{% endblock %}
+    </div>
 </header>

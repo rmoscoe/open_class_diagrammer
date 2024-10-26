@@ -2,8 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* GENERAL */
+
 body {
     @apply bg-white text-slate-600 font-serif text-base dark:bg-slate-800 dark:text-slate-300;
+}
+
+.with-tooltip {
+    @apply z-30 after:bg-blue-300 after:dark:bg-violet-300 after:text-slate-800 after:text-xs after:font-semibold after:transition-opacity after:duration-300 after:rounded after:absolute after:z-40 after:-top-7 after:left-1/2 after:px-2 after:py-1 after:opacity-0 hover:after:opacity-100;
 }
 
 
@@ -37,7 +43,7 @@ h6 {
 /* FORM CONTROLS */
 
 .btn {
-    @apply block px-3 py-2 rounded-md font-semibold cursor-pointer text-center shadow-md disabled:pointer-events-none disabled:cursor-not-allowed text-slate-600 dark:text-slate-300 focus:border-2 w-full sm:w-36 md:w-44 lg:w-52 xl:w-56;
+    @apply block px-3 py-2 rounded-md font-semibold cursor-pointer text-center shadow-md disabled:pointer-events-none disabled:cursor-not-allowed text-slate-200 dark:text-slate-300 focus:border-2 w-full sm:w-36 md:w-44 lg:w-52 xl:w-56;
 }
 
 .btn-square {
@@ -105,8 +111,7 @@ form > div {
 }
 
 ul.errorlist {
-    @apply list-disc text-red-700 dark:text-red-600 text-xs md:text-sm ml-4;
-    list-style-position:inside;
+    @apply list-disc text-red-700 dark:text-red-600 text-xs md:text-sm ml-4 list-inside;
 }
 
 .helptext {
@@ -167,10 +172,10 @@ td > a {
 
 /* NAV */
 
-nav > a {
-    @apply w-full p-1 flex justify-center hover:bg-blue-200 dark:hover:violet-300 active:bg-blue-300 focus:bg-blue-200 dark:active:bg-violet-400 dark:focus:bg-violet-300 group;
+nav > div > a {
+    @apply relative w-full p-1 flex justify-center hover:bg-blue-200 dark:hover:bg-violet-400 active:bg-blue-300 focus:bg-blue-200 dark:active:bg-violet-500 dark:focus:bg-violet-400 with-tooltip;
 }
 
-nav > a > i {
+nav > div > a > i {
     @apply text-blue-700 dark:text-violet-600 h-6 w-6 group-hover:text-blue-600 group-hover:dark:text-violet-500;
 }
