@@ -7,6 +7,8 @@ paths = []
 views = [ProjectListView, ProjectDetailView, ProjectCreateView, ProjectUpdateView, ModuleListView, ModuleDetailView, ModuleCreateView, ModuleUpdateView, ClassListView, ClassDetailView, ClassCreateView, ClassUpdateView, PropertyListView, PropertyDetailView, PropertyCreateView, PropertyUpdateView, MethodListView, MethodDetailView, MethodCreateView, MethodUpdateView, RelationshipListView, RelationshipDetailView, RelationshipCreateView, RelationshipUpdateView]
 names = []
 
+app_name = "class_manager"
+
 urlpatterns = []
 
 for m in models:

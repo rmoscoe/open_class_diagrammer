@@ -24,7 +24,7 @@ urlpatterns = [
     path("class-manager/", include("class_manager.urls")),
     path("", HomePageView.as_view(), name="home"),
     path("account/register/", SignupView.as_view(), name="register"),
-    path("account/login", OpenClassDiagrammerLoginView.as_view(), name="login"),
+    path("account/login/", OpenClassDiagrammerLoginView.as_view(), name="login"),
     path("account/<pk>/update/", UserUpdateView.as_view(), name="account-update"),
     path("account/<pk>/details/", UserDetailView.as_view(), name="account-detail"),
     path("logout/", LogoutView.as_view(), name="logout"),

@@ -16,7 +16,7 @@
 	</head>
 
 	<body 
-		class="bg-white font-sans leading-normal tracking-normal dark:bg-slate-800" 
+		class="bg-white font-sans leading-normal tracking-normal dark:bg-slate-800 min-h-screen" 
 		x-data="{ showSidebar: false, sidebarExpanded: false }" 
 		x-init="() => {
 			if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -30,7 +30,7 @@
 		}"
 	>
 		{% include "./partials/header.html" %}
-		<main class="flex">
+		<main class="flex min-h-[calc(100vh-2.5rem)] sm:min-h-[calc(100vh-3rem)] md:min-h-[calc(100vh-3.5rem)]">
 			{% include "./partials/sidebar.html" %}
 			{% block page %}{% endblock %}
 		</main>

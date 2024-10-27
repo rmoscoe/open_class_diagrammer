@@ -27,11 +27,11 @@
                 <i class="fa-solid fa-shapes"></i>
                 <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Classes</span>
             </a>
-            <a href="{% url 'class_manager:property-list' %}" class="group after-content-['Properties']" :class="sidebarExpanded && 'justify-between after:hidden'">
+            <a href="{% url 'class_manager:property-list' %}" class="group after:content-['Properties']" :class="sidebarExpanded && 'justify-between after:hidden'">
                 <i class="fa-solid fa-arrows-to-dot"></i>
                 <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Properties</span>
             </a>
-            <a href="{% url 'class_manager:method-list' %}" class="group after-content-['Methods']" :class="sidebarExpanded && 'justify-between after:hidden'">
+            <a href="{% url 'class_manager:method-list' %}" class="group after:content-['Methods']" :class="sidebarExpanded && 'justify-between after:hidden'">
                 <i class="fa-solid fa-rocket"></i>
                 <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Methods</span>
             </a>
@@ -49,7 +49,7 @@
                 <i class="fa-solid fa-user"></i>
                 <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Account</span>
             </a>
-            <a href="{% url 'logout' %}" class="group after:content-['Log Out']" :class="sidebarExpanded && 'justify-between after:hidden'">
+            <a href="{% url 'logout' %}" class="group after:content-['Log\00A0Out']" :class="sidebarExpanded && 'justify-between after:hidden'">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Log Out</span>
             </a>

@@ -9,7 +9,7 @@ body {
 }
 
 .with-tooltip {
-    @apply z-30 after:bg-blue-300 after:dark:bg-violet-300 after:text-slate-800 after:text-xs after:font-semibold after:transition-opacity after:duration-300 after:rounded after:absolute after:z-40 after:-top-7 after:left-1/2 after:px-2 after:py-1 after:opacity-0 hover:after:opacity-100;
+    @apply z-30 after:bg-blue-300 after:dark:bg-violet-300 after:text-slate-800 after:text-xs after:font-semibold after:transition-opacity after:duration-300 after:rounded after:absolute after:z-40 after:-top-6 after:left-3/4 after:px-2 after:py-1 after:opacity-0 hover:after:opacity-100;
 }
 
 
@@ -58,12 +58,8 @@ h6 {
     @apply bg-red-500 dark:bg-red-600 hover:bg-red-600 focus:border-red-200 disabled:bg-red-300 dark:text-slate-300 dark:hover:bg-red-700 dark:focus:border-red-300 dark:disabled:bg-red-400 active:bg-red-600 dark:active:bg-red-700;
 }
 
-.btn.blue, .btn-square.blue {
-    @apply bg-blue-700 dark:bg-blue-600 hover:bg-blue-600 focus:border-blue-200 disabled:bg-blue-300 dark:text-slate-300 dark:hover:bg-blue-500 dark:focus:border-blue-300 dark:disabled:bg-blue-400 active:bg-blue-800 dark:active:bg-blue-700;
-}
-
-.btn.violet, .btn-square.violet {
-    @apply bg-violet-700 dark:bg-violet-600 hover:bg-violet-600 focus:border-violet-200 disabled:bg-violet-300 dark:text-slate-300 dark:hover:bg-violet-500 dark:focus:border-violet-300 dark:disabled:bg-violet-400 active:bg-violet-800 dark:active:bg-violet-700;
+.btn.primary, .btn-square.primary {
+    @apply bg-blue-700 dark:bg-violet-700 hover:bg-blue-600 focus:border-blue-200 disabled:bg-blue-300 dark:text-slate-300 dark:hover:bg-violet-600 dark:focus:border-violet-400 dark:disabled:bg-violet-300 active:bg-blue-800 dark:active:bg-violet-800;
 }
 
 input, select, textarea {
@@ -111,7 +107,11 @@ form > div {
 }
 
 ul.errorlist {
-    @apply list-disc text-red-700 dark:text-red-600 text-xs md:text-sm ml-4 list-inside;
+    @apply list-disc text-red-700 dark:text-red-600 text-xs md:text-sm ml-6 list-outside;
+}
+
+.errorlist > li {
+    @apply pl-2 md:pl-4;
 }
 
 .helptext {

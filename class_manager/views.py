@@ -1,26 +1,16 @@
-from datetime import date
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django import forms
-from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
-from django.contrib.sites.requests import RequestSite
-from django.contrib.sites.models import Site
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, Http404
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.views import View
-from django.views.generic import ListView, DetailView, FormView
+from django.views.generic import ListView, DetailView
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView
 from .forms import UserForm, ProjectForm, ModuleForm, ClassForm, PropertyForm, MethodForm, RelationshipForm
 from .helpers import build_color_theme
-import json
 from .models import *
-import os
-import re
 
 # Create your views here.
 DEFAULT_COLORS = {
@@ -207,7 +197,7 @@ class AnonymousUserMixin(UserPassesTestMixin):
         return not self.request.user.is_authenticated
     
     def handle_no_permission(self):
-        return HttpResponseRedirect(reverse_lazy("class_manager:workbench"))
+        return HttpResponseRedirect(reverse_lazy("workbench"))
 
 class OCDListMixin:
     template_name = "class_manager/list.html"
@@ -260,7 +250,7 @@ class HomePageView(TemplateView):
 class SignupView(CreateView):
     model = User
     template_name = "class_manager/signup.html"
-    success_url = reverse_lazy("class_manager:login")
+    success_url = reverse_lazy("login")
     form_class = UserForm
 
     def get_context_data(self, **kwargs):
@@ -276,7 +266,7 @@ class SignupView(CreateView):
 class OpenClassDiagrammerLoginView(AnonymousUserMixin, LoginView):
     model = User
     template_name = "class_manager/login.html"
-    success_url = reverse_lazy("class_manager:workbench")
+    success_url = reverse_lazy("workbench")
     form_class = AuthenticationForm
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
@@ -285,7 +275,7 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     form_class = UserForm
 
     def get_success_url(self):
-        return reverse("class_manager:account-detail", kwargs={"pk": self.request.user.id})
+        return reverse("account-detail", kwargs={"pk": self.request.user.id})
     
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User

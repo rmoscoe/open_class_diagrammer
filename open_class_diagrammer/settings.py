@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "django.contrib.sites",
     "class_manager",
     "tailwind",
     "theme",
@@ -127,7 +126,7 @@ else:
 
 LOGIN_URL = reverse_lazy("login")
 
-LOGIN_REDIRECT_URL = reverse_lazy("class_manager:projects")
+LOGIN_REDIRECT_URL = reverse_lazy("workbench")
 
 LOGOUT_REDIRECT_URL = reverse_lazy("home")
 
