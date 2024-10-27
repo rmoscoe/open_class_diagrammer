@@ -35,6 +35,10 @@
                 <i class="fa-solid fa-rocket"></i>
                 <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Methods</span>
             </a>
+            <a href="{% url 'class_manager:relationship-list' %}" class="group after:content-['Relationships']" :class="sidebarExpanded && 'justify-between after:hidden'">
+                <i class="fa-solid fa-sitemap"></i>
+                <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Relationships</span>
+            </a>
             {% endif %}
         </div>
         <div class="h-0.5 bg-slate-500 rounded w-full"></div>

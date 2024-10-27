@@ -75,7 +75,7 @@ class Module(Model):
     description = models.TextField(null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     projects = models.ManyToManyField(Project, through="ProjectModule")
-    color = models.CharField(max_length=7, blank=True, default="#1d4ed8")
+    color = models.CharField(max_length=7, blank=True, default="#d8")
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     last_modified_at = models.DateTimeField(auto_now=True, blank=True)
 

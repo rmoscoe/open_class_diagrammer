@@ -287,6 +287,60 @@ class UserDetailView(LoginRequiredMixin, DetailView):
 class WorkbenchView(LoginRequiredMixin, TemplateView):
     template_name = "class_manager/workbench.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        projects = Project.objects.filter(user=self.request.user.id)
+        modules = Module.objects.filter(user=self.request.user.id)
+        classes = Class.objects.filter(user=self.request.user.id)
+        properties = Property.objects.filter(user=self.request.user.id)
+        methods = Method.objects.filter(user=self.request.user.id)
+        relationships = Relationship.objects.filter(from_model__in=classes)
+        context["data"] = {
+            "projects": {
+                "icon_class": "fa-solid fa-list-check",
+                "list": "class_manager:project-list",
+                "add": "class_manager:project-create",
+                "details": "A project is a complete application that includes at least one module.",
+                "objects": projects
+            },
+            "modules": {
+                "icon_class": "fa-solid fa-robot",
+                "list": "class_manager:module-list",
+                "add": "class_manager:module-create",
+                "details": "A module is a functional component of a project and includes at least one class. A module could potentially be reused in (and thus, belong to) multiple projects. Examples include a blog, a learning system, a performance system, a succession management tool, and an individual development planning tool that are all part of a single talent management system (project).",
+                "objects": modules
+            },
+            "classes": {
+                "icon_class": "fa-solid fa-shapes",
+                "list": "class_manager:class-list",
+                "add": "class_manager:class-create",
+                "details": "A class is a blueprint for objects in a software program. It is the core element of the Entity Relationship Diagram and is a member of a module. It includes properties and/or methods and can be related to other classes in various ways.",
+                "objects": classes
+            },
+            "properties": {
+                "icon_class": "fa-solid fa-arrows-to-dot",
+                "list": "class_manager:property-list",
+                "add": "class_manager:property-create",
+                "details": "A property is an attribute of a class and its instances.",
+                "objects": properties
+            },
+            "methods": {
+                "icon_class": "fa-solid fa-rocket",
+                "list": "class_manager:method-list",
+                "add": "class_manager:method-create",
+                "details": "A method is an action (function) that a class or one of its instances can perform.",
+                "objects": methods
+            },
+            "relationships": {
+                "icon_class": "fa-solid fa-sitemap",
+                "list": "class_manager:relationship-list",
+                "add": "class_manager:relationship-create",
+                "details": "A relationship describes the link between two classes, such as inheritance or ownership (e.g., one-to-many)",
+                "objects": relationships
+            }
+        }
+        return context
+
 
 #================================#
 #         PROJECT VIEWS          #
