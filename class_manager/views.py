@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy, reverse, resolve
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView
@@ -199,6 +199,13 @@ class AnonymousUserMixin(UserPassesTestMixin):
     def handle_no_permission(self):
         return HttpResponseRedirect(reverse_lazy("workbench"))
 
+class UserFormViewMixin:
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        resolver_match = resolve(self.request.path)
+        kwargs.update({"path": resolver_match.url_name})
+        return kwargs
+
 class OCDListMixin:
     template_name = "class_manager/list.html"
 
@@ -247,7 +254,7 @@ class OCDDeleteMixin:
 class HomePageView(TemplateView):
     template_name = "class_manager/home.html"
 
-class SignupView(CreateView):
+class SignupView(UserFormViewMixin, CreateView):
     model = User
     template_name = "class_manager/signup.html"
     success_url = reverse_lazy("login")
@@ -269,7 +276,7 @@ class OpenClassDiagrammerLoginView(AnonymousUserMixin, LoginView):
     success_url = reverse_lazy("workbench")
     form_class = AuthenticationForm
 
-class UserUpdateView(LoginRequiredMixin, UpdateView):
+class UserUpdateView(LoginRequiredMixin, UserFormViewMixin, UpdateView):
     model = User
     template_name = "class_manager/account_update.html"
     form_class = UserForm

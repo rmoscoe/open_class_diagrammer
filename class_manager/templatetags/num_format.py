@@ -3,7 +3,7 @@ from django import template
 register = template.Library()
 
 @register.filter
-def num_format(num):
+def num_format(num, fmt=","):
     if not isinstance(num, int) and not isinstance(num, float):
         return num
-    return f"{num:,}"
+    return format(num, fmt)
