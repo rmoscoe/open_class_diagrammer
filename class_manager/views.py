@@ -8,7 +8,7 @@ from django.urls import reverse_lazy, reverse, resolve
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView
-from .forms import UserForm, ProjectForm, ModuleForm, ClassForm, PropertyForm, MethodForm, RelationshipForm
+from .forms import RegistrationForm, UpdateUserForm, ProjectForm, ModuleForm, ClassForm, PropertyForm, MethodForm, RelationshipForm # , UserForm
 from .helpers import build_color_theme
 from .models import *
 
@@ -199,12 +199,12 @@ class AnonymousUserMixin(UserPassesTestMixin):
     def handle_no_permission(self):
         return HttpResponseRedirect(reverse_lazy("workbench"))
 
-class UserFormViewMixin:
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        resolver_match = resolve(self.request.path)
-        kwargs.update({"path": resolver_match.url_name})
-        return kwargs
+# class UserFormViewMixin:
+#     def get_form_kwargs(self):
+#         kwargs = super().get_form_kwargs()
+#         resolver_match = resolve(self.request.path)
+#         kwargs.update({"path": resolver_match.url_name})
+#         return kwargs
 
 class OCDListMixin:
     template_name = "class_manager/list.html"
@@ -254,11 +254,11 @@ class OCDDeleteMixin:
 class HomePageView(TemplateView):
     template_name = "class_manager/home.html"
 
-class SignupView(UserFormViewMixin, CreateView):
+class SignupView(CreateView):
     model = User
     template_name = "class_manager/signup.html"
     success_url = reverse_lazy("login")
-    form_class = UserForm
+    form_class = RegistrationForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -276,10 +276,10 @@ class OpenClassDiagrammerLoginView(AnonymousUserMixin, LoginView):
     success_url = reverse_lazy("workbench")
     form_class = AuthenticationForm
 
-class UserUpdateView(LoginRequiredMixin, UserFormViewMixin, UpdateView):
+class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     template_name = "class_manager/account_update.html"
-    form_class = UserForm
+    form_class = UpdateUserForm
 
     def get_success_url(self):
         return reverse("account-detail", kwargs={"pk": self.request.user.id})
@@ -289,7 +289,7 @@ class UserDetailView(LoginRequiredMixin, DetailView):
     template_name = "class_manager/user_detail.html"
 
     def get_queryset(self):
-        return User.objects.get(pk=self.request.user.id)
+        return User.objects.filter(pk=self.request.user.id)
     
 class WorkbenchView(LoginRequiredMixin, TemplateView):
     template_name = "class_manager/workbench.html"

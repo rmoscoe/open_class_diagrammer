@@ -6,66 +6,40 @@ from django.forms import ModelForm
 from .helpers import prepare_dict_for_form
 from .models import *
 
-class UserForm(UserCreationForm):
-    first_name = forms.CharField(max_length=40, required=True)
-    last_name = forms.CharField(max_length=40, required=True)
-    email = forms.EmailField(required=True)
-    password1 = forms.CharField(label="Password", widget=forms.PasswordInput, required=False)
-    password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput, required=False)
-
-    def __init__(self, *args, **kwargs):
-        path = kwargs.pop("path", "register")
-        self.user = kwargs.get("instance", None)
-        super().__init__(*args, **kwargs)
-
-        self.fields["username"].initial = getattr(self.user, "username", None)
-        self.fields["first_name"].initial = getattr(self.user, "first_name", None)
-        self.fields["last_name"].initial = getattr(self.user, "last_name", None)
-        self.fields["email"].initial = getattr(self.user, "email", None)
-
-        if path == "account-update":
-            self.fields["password1"].label = "New Password"
-            self.fields["password2"].label = "Confirm New Password"
-
-    def clean_password2(self):
-        password1 = self.cleaned_data.get("password1")
-        password2 = self.cleaned_data.get("password2")
-        if password1 and password2 and password1 != password2:
-            raise ValidationError("Passwords don't match")
-        return password2
-
-    class Meta:
-        model = User
-        fields = ["username", "password1", "password2", "first_name", "last_name", "email"]
-        
-    def is_valid(self):
-        valid = super().is_valid()
-        if not valid:
-            errors = self._errors.setdefault(forms.forms.NON_FIELD_ERRORS, forms.utils.ErrorList())
-            for field, field_errors in self.errors.items():
-                if field != '__all__':
-                    continue
-                for error in field_errors:
-                    errors.append(error)
-        return valid
-
-# Alternative user forms if the single form approach doesn't work
-# class SignUpForm(UserCreationForm):
+# class UserForm(UserCreationForm):
 #     first_name = forms.CharField(max_length=40, required=True)
 #     last_name = forms.CharField(max_length=40, required=True)
 #     email = forms.EmailField(required=True)
+#     password1 = forms.CharField(label="Password", widget=forms.PasswordInput, required=False)
+#     password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput, required=False)
+
+#     def __init__(self, *args, **kwargs):
+#         path = kwargs.pop("path", "register")
+#         self.user = kwargs.get("instance", None)
+#         super().__init__(*args, **kwargs)
+
+#         self.fields["username"].initial = getattr(self.user, "username", None)
+#         self.fields["first_name"].initial = getattr(self.user, "first_name", None)
+#         self.fields["last_name"].initial = getattr(self.user, "last_name", None)
+#         self.fields["email"].initial = getattr(self.user, "email", None)
+
+#         if path == "account-update":
+#             self.fields["password1"].label = "New Password"
+#             self.fields["password2"].label = "Confirm New Password"
+
+#     def clean_password2(self):
+#         password1 = self.cleaned_data.get("password1")
+#         password2 = self.cleaned_data.get("password2")
+#         if password1 and password2 and password1 != password2:
+#             raise ValidationError("Passwords don't match")
+#         return password2
 
 #     class Meta:
 #         model = User
 #         fields = ["username", "password1", "password2", "first_name", "last_name", "email"]
-
-#     def clean(self):
-#         cleaned_data = super(ModelForm, self).clean()
-#         return cleaned_data
-
+        
 #     def is_valid(self):
 #         valid = super().is_valid()
-#         print(f"Valid: {valid}")
 #         if not valid:
 #             errors = self._errors.setdefault(forms.forms.NON_FIELD_ERRORS, forms.utils.ErrorList())
 #             for field, field_errors in self.errors.items():
@@ -75,29 +49,55 @@ class UserForm(UserCreationForm):
 #                     errors.append(error)
 #         return valid
 
-# class UpdateUserForm(ModelForm):
-#     password1 = forms.CharField(label="Password", widget=forms.PasswordInput, required=False)
-#     password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput, required=False)
+# Alternative user forms if the single form approach doesn't work
+class RegistrationForm(UserCreationForm):
+    first_name = forms.CharField(max_length=40, required=True)
+    last_name = forms.CharField(max_length=40, required=True)
+    email = forms.EmailField(required=True)
 
-#     class Meta:
-#         model = User
-#         fields = ["username", "password1", "password2", "first_name", "last_name", "email"]
+    class Meta:
+        model = User
+        fields = ["username", "password1", "password2", "first_name", "last_name", "email"]
 
-#         def __init__(self, *args, **kwargs):
-#             self.user = kwargs.get("instance", None)
-#             super().__init__(*args, **kwargs)
+    def clean(self):
+        cleaned_data = super(ModelForm, self).clean()
+        return cleaned_data
 
-#             self.fields["username"].initial = getattr(self.user, "username", None)
-#             self.fields["first_name"].initial = getattr(self.user, "first_name", None)
-#             self.fields["last_name"].initial = getattr(self.user, "last_name", None)
-#             self.fields["email"].initial = getattr(self.user, "email", None)
+    def is_valid(self):
+        valid = super().is_valid()
+        print(f"Valid: {valid}")
+        if not valid:
+            errors = self._errors.setdefault(forms.forms.NON_FIELD_ERRORS, forms.utils.ErrorList())
+            for field, field_errors in self.errors.items():
+                if field != '__all__':
+                    continue
+                for error in field_errors:
+                    errors.append(error)
+        return valid
 
-#         def clean_password2(self):
-#             password1 = self.cleaned_data.get("password1")
-#             password2 = self.cleaned_data.get("password2")
-#             if password1 and password2 and password1 != password2:
-#                 raise ValidationError("Passwords don't match")
-#             return password2
+class UpdateUserForm(ModelForm):
+    password1 = forms.CharField(label="New Password", widget=forms.PasswordInput, required=False)
+    password2 = forms.CharField(label="Confirm New Password", widget=forms.PasswordInput, required=False)
+
+    class Meta:
+        model = User
+        fields = ["username", "password1", "password2", "first_name", "last_name", "email"]
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.get("user", None)
+        super().__init__(*args, **kwargs)
+
+        self.fields["username"].initial = getattr(self.user, "username", None)
+        self.fields["first_name"].initial = getattr(self.user, "first_name", None)
+        self.fields["last_name"].initial = getattr(self.user, "last_name", None)
+        self.fields["email"].initial = getattr(self.user, "email", None)
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise ValidationError("Passwords don't match")
+        return password2
 
 class ProjectForm(ModelForm):
     modules = forms.ModelMultipleChoiceField(queryset=Module.objects.none(), widget=forms.CheckboxSelectMultiple)
