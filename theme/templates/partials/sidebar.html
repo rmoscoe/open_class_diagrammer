@@ -53,17 +53,20 @@
                 <i class="fa-solid fa-user"></i>
                 <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Account</span>
             </a>
-            <a href="{% url 'logout' %}" class="group after:content-['Log\00A0Out']" :class="sidebarExpanded && 'justify-between after:hidden'">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Log Out</span>
-            </a>
+            <form id="logout-form" method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="group after:content-['Log\00A0Out'] relative w-full p-1 flex justify-center hover:bg-blue-200 dark:hover:bg-violet-400 active:bg-blue-300 focus:bg-blue-200 dark:active:bg-violet-500 dark:focus:bg-violet-400 with-tooltip" :class="sidebarExpanded && 'justify-between after:hidden'">
+                    <i class="fa-solid fa-right-from-bracket text-blue-700 dark:text-violet-600 h-6 w-6 group-hover:text-blue-600 group-hover:dark:text-violet-500"></i>
+                    <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Log Out</span>
+                </button>
+            </form>
             {% else%}
             <a href="{% url 'login' %}" class="group after:content-['Log\00A0In']" :class="sidebarExpanded && 'justify-between after:hidden'">
                 <i class="fa-solid fa-right-to-bracket"></i>
                 <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Log In</span>
             </a>
             <a href="{% url 'register' %}" class="group after:content-['Register']" :class="sidebarExpanded && 'justify-between after:hidden'">
-                <i class="fa-solid fa-user-plus"></i>
+                <i class="fa-solid fa-user-plus "></i>
                 <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Register</span>
             </a>
             {% endif %}
