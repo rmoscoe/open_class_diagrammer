@@ -199,13 +199,6 @@ class AnonymousUserMixin(UserPassesTestMixin):
     def handle_no_permission(self):
         return HttpResponseRedirect(reverse_lazy("workbench"))
 
-# class UserFormViewMixin:
-#     def get_form_kwargs(self):
-#         kwargs = super().get_form_kwargs()
-#         resolver_match = resolve(self.request.path)
-#         kwargs.update({"path": resolver_match.url_name})
-#         return kwargs
-
 class OCDListMixin:
     template_name = "class_manager/list.html"
 
