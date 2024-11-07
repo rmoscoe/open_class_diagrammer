@@ -202,11 +202,21 @@ class AnonymousUserMixin(UserPassesTestMixin):
 class OCDListMixin:
     template_name = "class_manager/list.html"
 
-    def get_queryset(self):
-        return Project.objects.filter(user=self.request.user.id)
+    # def get_queryset(self):
+    #     return Project.objects.filter(user=self.request.user.id)
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["create_route"] = self.model.__name__.lower() + "-create"
+        context["detail_route"] = self.model.__name__.lower() + "-detail"
+        return context
 
 class OCDDetailMixin:
     template_name = "class_manager/detail.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["create_route"] = self.model.__name__.lower() + "-create"
     
 class OCDEditMixin:
     def form_valid(self, form):
@@ -219,6 +229,11 @@ class OCDEditMixin:
         return kwargs
 
 class OCDDeleteMixin:
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["delete_route"] = self.request.path
+        return context
+
     def delete(self, request, *args, **kwargs):
         model = self.model
         try:
@@ -300,42 +315,42 @@ class WorkbenchView(LoginRequiredMixin, TemplateView):
                 "icon_class": "fa-solid fa-list-check",
                 "list": "class_manager:project-list",
                 "add": "class_manager:project-create",
-                "details": "A project is a complete application that includes at least one module.",
+                "details": Project.details,
                 "objects": projects
             },
             "modules": {
                 "icon_class": "fa-solid fa-robot",
                 "list": "class_manager:module-list",
                 "add": "class_manager:module-create",
-                "details": "A module is a functional component of a project and includes at least one class. A module could potentially be reused in (and thus, belong to) multiple projects. Examples include a blog, a learning system, a performance system, a succession management tool, and an individual development planning tool that are all part of a single talent management system (project).",
+                "details": Module.details,
                 "objects": modules
             },
             "classes": {
                 "icon_class": "fa-solid fa-shapes",
                 "list": "class_manager:class-list",
                 "add": "class_manager:class-create",
-                "details": "A class is a blueprint for objects in a software program. It is the core element of the Entity Relationship Diagram and is a member of a module. It includes properties and/or methods and can be related to other classes in various ways.",
+                "details": Class.details,
                 "objects": classes
             },
             "properties": {
                 "icon_class": "fa-solid fa-arrows-to-dot",
                 "list": "class_manager:property-list",
                 "add": "class_manager:property-create",
-                "details": "A property is an attribute of a class and its instances.",
+                "details": Property.details,
                 "objects": properties
             },
             "methods": {
                 "icon_class": "fa-solid fa-rocket",
                 "list": "class_manager:method-list",
                 "add": "class_manager:method-create",
-                "details": "A method is an action (function) that a class or one of its instances can perform.",
+                "details": Method.details,
                 "objects": methods
             },
             "relationships": {
                 "icon_class": "fa-solid fa-sitemap",
                 "list": "class_manager:relationship-list",
                 "add": "class_manager:relationship-create",
-                "details": "A relationship describes the link between two classes, such as inheritance or ownership (e.g., one-to-many)",
+                "details": Relationship.details,
                 "objects": relationships
             }
         }
@@ -348,6 +363,9 @@ class WorkbenchView(LoginRequiredMixin, TemplateView):
 
 class ProjectListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView):
     model = Project
+
+    def get_queryset(self):
+        return Project.objects.filter(user=self.request.user.id)
 
 class ProjectDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Project
@@ -370,8 +388,14 @@ class ProjectUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, Update
 class ModuleListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView):
     model = Module
 
+    def get_queryset(self):
+        return Module.objects.prefetch_related("projects").filter(user=self.request.user.id)
+
 class ModuleDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Module
+
+    def get_queryset(self):
+        return Module.objects.prefetch_related("projects").filter(user=self.request.user.id)
 
 class ModuleCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
     model = Module
@@ -400,9 +424,15 @@ class ModuleUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, UpdateV
 
 class ClassListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView):
     model = Class
+
+    def get_queryset(self):
+        return Class.objects.select_related("module").prefetch_related("module__projects").filter(user=self.request.user.id)
     
 class ClassDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Class
+
+    def get_queryset(self):
+        return Class.objects.select_related("module").prefetch_related("module__projects").filter(user=self.request.user.id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -431,8 +461,14 @@ class ClassUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, UpdateVi
 class PropertyListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView):
     model = Property
 
+    def get_queryset(self):
+        return Property.objects.select_related("class_assoc").select_related("class_assoc__module").prefetch_related("class_assoc__module__projects").filter(user=self.request.user.id)
+
 class PropertyDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Property
+
+    def get_queryset(self):
+        return Property.objects.select_related("class_assoc").select_related("class_assoc__module").prefetch_related("class_assoc__module__projects").filter(user=self.request.user.id)
 
 class PropertyCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
     model = Property
@@ -452,8 +488,14 @@ class PropertyUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, Updat
 class MethodListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView):
     model = Method
 
+    def get_queryset(self):
+        return Method.objects.select_related("class_assoc").select_related("class_assoc__module").prefetch_related("class_assoc__module__projects").filter(user=self.request.user.id)
+
 class MethodDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Method
+
+    def get_queryset(self):
+        return Method.objects.select_related("class_assoc").select_related("class_assoc__module").prefetch_related("class_assoc__module__projects").filter(user=self.request.user.id)
 
 class MethodCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
     model = Method
@@ -474,8 +516,14 @@ class RelationshipListView(LoginRequiredMixin, OCDDeleteMixin, ListView):
     model = Relationship
     template_name = "class_manager/list.html"
 
+    def get_queryset(self):
+        return Relationship.objects.select_related("from_class", "to_class").prefetch_related("from_class__module", "to_class__module").filter(user=self.request.user.id)
+
 class RelationshipDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Relationship
+
+    def get_queryset(self):
+        return Relationship.objects.select_related("from_class", "to_class").prefetch_related("from_class__module", "to_class__module").filter(user=self.request.user.id)
 
 class RelationshipCreateView(LoginRequiredMixin, CreateView):
     model = Relationship

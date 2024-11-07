@@ -136,4 +136,4 @@ class MethodForm(ModelForm):
 class RelationshipForm(ModelForm):
     class Meta:
         model = Relationship
-        fields = ["from_model", "to_model", "relationship_type"]
+        fields = ["from_class", "to_class", "relationship_type"]

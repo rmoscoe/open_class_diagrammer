@@ -69,18 +69,34 @@ class Project(Model):
 
     class Meta:
         ordering = ["name"]
+    
+    @property
+    def plural_name(self):
+        return "Projects"
+    
+    @property
+    def details(self):
+        return "A project is a complete application that includes at least one module."
 
 class Module(Model):
     name = models.CharField(max_length=160)
     description = models.TextField(null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     projects = models.ManyToManyField(Project, through="ProjectModule")
-    color = models.CharField(max_length=7, blank=True, default="#d8")
+    color = models.CharField(max_length=7, blank=True, default="#1d4ed8")
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     last_modified_at = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
         ordering = ["name"]
+
+    @property
+    def plural_name(self):
+        return "Modules"
+    
+    @property
+    def details(self):
+        return "A module is a functional component of a project and includes at least one class. A module could potentially be reused in (and thus, belong to) multiple projects. Examples include a blog, a learning system, a performance system, a succession management tool, and an individual development planning tool that are all part of a single talent management system (project)."
 
 class ProjectModule(Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
@@ -106,6 +122,14 @@ class Class(Model):
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     last_modified_at = models.DateTimeField(auto_now=True, blank=True)
 
+    @property
+    def plural_name(self):
+        return "Classes"
+    
+    @property
+    def details(self):
+        return "A class is a blueprint for objects in a software program. It is the core element of the Entity Relationship Diagram and is a member of a module. It includes properties and/or methods and can be related to other classes in various ways."
+
 class BaseAttribute(Model):
     name = models.CharField(max_length=160)
     class_assoc = models.ForeignKey(Class, on_delete=models.CASCADE)
@@ -119,12 +143,36 @@ class Property(BaseAttribute):
         selected_types = self.data_type.split(" | ")
         flattened_choices = flatten_dict(DATA_TYPE_CHOICES)
         return " | ".join(flattened_choices.get(choice, choice) for choice in selected_types)
+    
+    @property
+    def plural_name(self):
+        return "Properties"
+    
+    @property
+    def details(self):
+        return "A property is an attribute of a class and its instances."
 
 class Method(BaseAttribute):
     arguments = models.CharField(max_length=255, null=True, blank=True)
     return_type = models.CharField(max_length=160, null=True, blank=True)
 
+    @property
+    def plural_name(self):
+        return "Methods"
+    
+    @property
+    def details(self):
+        return "A method is an action (function) that a class or one of its instances can perform."
+
 class Relationship(Model):
-    from_model = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="from_model")
-    to_model = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="to_model")
+    from_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="from_class")
+    to_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="to_class")
     relationship_type = models.CharField(max_length=80, choices=get_relationship_type_choices)
+
+    @property
+    def plural_name(self):
+        return "Relationships"
+    
+    @property
+    def details(self):
+        return "A relationship describes the link between two classes, such as inheritance or ownership (e.g., one-to-many)"
