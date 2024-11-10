@@ -207,8 +207,8 @@ class OCDListMixin:
     
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["create_route"] = self.model.__name__.lower() + "-create"
-        context["detail_route"] = self.model.__name__.lower() + "-detail"
+        context["create_route"] = "class_manager:" + self.model.__name__.lower() + "-create"
+        context["detail_route"] = "class_manager" + self.model.__name__.lower() + "-detail"
         return context
 
 class OCDDetailMixin:
@@ -216,7 +216,7 @@ class OCDDetailMixin:
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["create_route"] = self.model.__name__.lower() + "-create"
+        context["create_route"] = "class_manager:" + self.model.__name__.lower() + "-create"
     
 class OCDEditMixin:
     def form_valid(self, form):

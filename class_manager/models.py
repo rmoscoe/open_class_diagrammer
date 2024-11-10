@@ -71,10 +71,6 @@ class Project(Model):
         ordering = ["name"]
     
     @property
-    def plural_name(self):
-        return "Projects"
-    
-    @property
     def details(self):
         return "A project is a complete application that includes at least one module."
 
@@ -89,10 +85,6 @@ class Module(Model):
 
     class Meta:
         ordering = ["name"]
-
-    @property
-    def plural_name(self):
-        return "Modules"
     
     @property
     def details(self):
@@ -122,9 +114,8 @@ class Class(Model):
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     last_modified_at = models.DateTimeField(auto_now=True, blank=True)
 
-    @property
-    def plural_name(self):
-        return "Classes"
+    class Meta:
+        verbose_name_plural = "classes"
     
     @property
     def details(self):
@@ -144,9 +135,8 @@ class Property(BaseAttribute):
         flattened_choices = flatten_dict(DATA_TYPE_CHOICES)
         return " | ".join(flattened_choices.get(choice, choice) for choice in selected_types)
     
-    @property
-    def plural_name(self):
-        return "Properties"
+    class Meta:
+        verbose_name_plural = "properties"
     
     @property
     def details(self):
@@ -155,10 +145,6 @@ class Property(BaseAttribute):
 class Method(BaseAttribute):
     arguments = models.CharField(max_length=255, null=True, blank=True)
     return_type = models.CharField(max_length=160, null=True, blank=True)
-
-    @property
-    def plural_name(self):
-        return "Methods"
     
     @property
     def details(self):
@@ -168,10 +154,6 @@ class Relationship(Model):
     from_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="from_class")
     to_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="to_class")
     relationship_type = models.CharField(max_length=80, choices=get_relationship_type_choices)
-
-    @property
-    def plural_name(self):
-        return "Relationships"
     
     @property
     def details(self):
