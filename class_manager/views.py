@@ -375,6 +375,11 @@ class ProjectCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
     form_class = ProjectForm
     template_name = "class_manager/create.html"
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["action"] = "class_manager:project-create"
+        return context
+
 class ProjectUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, UpdateView):
     model = Project
     form_class = ProjectForm
@@ -405,6 +410,7 @@ class ModuleCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["color_choices"] = DEFAULT_COLORS
+        context["action"] = "class_manager:module-create"
         return context
 
 class ModuleUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, UpdateView):
@@ -448,6 +454,11 @@ class ClassCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
     form_class = ClassForm
     template_name = "class_manager/create.html"
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["action"] = "class_manager:class-create"
+        return context
+
 class ClassUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, UpdateView):
     model = Class
     form_class = ClassForm
@@ -474,6 +485,11 @@ class PropertyCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
     model = Property
     form_class = PropertyForm
     template_name = "class_manager/create.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["action"] = "class_manager:property-create"
+        return context
 
 class PropertyUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, UpdateView):
     model = Property
@@ -502,6 +518,11 @@ class MethodCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
     form_class = MethodForm
     template_name = "class_manager/create.html"
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["action"] = "class_manager:method-create"
+        return context
+
 class MethodUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, UpdateView):
     model = Method
     form_class = MethodForm
@@ -529,6 +550,11 @@ class RelationshipCreateView(LoginRequiredMixin, CreateView):
     model = Relationship
     form_class = RelationshipForm
     template_name = "class_manager/create.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["action"] = "class_manager:relationship-create"
+        return context
 
     def get_success_url(self):
         if self.request.POST.get("page", "relationship-detail") == "class-detail":
