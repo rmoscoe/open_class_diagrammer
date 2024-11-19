@@ -3,7 +3,7 @@
 <aside class="p-2 sm:p-4 md:p-2 xl:py-4 xl:px-8 -translate-x-full transition-transform duration-300 overflow-visible z-30" :class="showSidebar ? 'relative top-0 bottom-0 left-0 border-r border-slate-300 dark:border-slate-400 translate-x-0' : 'absolute'">
     <nav class="px-1 md:px-2 w-10 flex justify-center flex-wrap space-y-2 sm:space-y-4 md:space-y-6 transition-[width] duration-300 overflow-visible z-30" :class="sidebarExpanded && 'md:w-48 lg:w-56'">
         <div class="flex items-center justify-center w-full overflow-visible">
-            <button @click="sidebarExpanded = !sidebarExpanded" class="relative w-full p-1 text-blue-700 dark:text-violet-600 flex justify-end items-baseline hover:bg-blue-200 dark:hover:bg-violet-400 active:bg-blue-300 dark:active:bg-violet-400 after:content-['Expand'] with-tooltip" :class="sidebarExpanded && 'after:hidden'">
+            <button @click="sidebarExpanded = !sidebarExpanded" class="relative w-full p-1 text-violet-700 dark:text-violet-600 flex justify-end items-baseline hover:bg-violet-200 dark:hover:bg-violet-400 active:bg-violet-300 dark:active:bg-violet-400 after:content-['Expand'] with-tooltip" :class="sidebarExpanded && 'after:hidden'">
                 |
                 <i class="fa-solid fa-angles-right transition-transform duration-300 h-4 w-4" :class="sidebarExpanded && 'rotate-180'"></i>
             </button>
@@ -43,7 +43,7 @@
         </div>
         <div class="h-0.5 bg-slate-500 rounded w-full"></div>
         <div class="space-y-2 flex justify-center flex-wrap w-full overflow-visible">
-            <button class="relative w-full p-1 flex justify-between items-center hover:bg-blue-200 dark:hover:bg-violet-400 active:bg-blue-300 focus:bg-blue-200 dark:active:bg-violet-500 dark:focus:bg-violet-400 with-tooltip after:content-['Toggle\00A0Theme']" x-data="{ theme: 'light'}" @click="const currentTheme = localStorage.getItem('theme'); if (currentTheme === 'light') {localStorage.setItem('theme', 'dark'); theme = 'dark';} else {localStorage.setItem('theme', 'light'); theme = 'light'}; console.log('toggling theme'); document.documentElement.classList.toggle('dark')" x-init="() => {theme = localStorage.getItem('theme')}" :class="sidebarExpanded && 'after:hidden'">
+            <button class="relative w-full p-1 flex justify-between items-center hover:bg-violet-200 dark:hover:bg-violet-400 active:bg-violet-300 focus:bg-violet-200 dark:active:bg-violet-500 dark:focus:bg-violet-400 with-tooltip after:content-['Toggle\00A0Theme']" x-data="{ theme: 'light'}" @click="const currentTheme = localStorage.getItem('theme'); if (currentTheme === 'light') {localStorage.setItem('theme', 'dark'); theme = 'dark';} else {localStorage.setItem('theme', 'light'); theme = 'light'}; console.log('toggling theme'); document.documentElement.classList.toggle('dark')" x-init="() => {theme = localStorage.getItem('theme')}" :class="sidebarExpanded && 'after:hidden'">
                 <i class="fa-solid fa-circle-half-stroke text-slate-700 dark:hidden"></i>
                 <i class="text-yellow-400" :class="theme === 'dark' ? 'fa-solid fa-sun' : 'hidden'"></i>
                 <span x-show="sidebarExpanded" class="ml-2">Toggle Theme</span>
@@ -53,10 +53,10 @@
                 <i class="fa-solid fa-user"></i>
                 <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Account</span>
             </a>
-            <form id="logout-form" method="post" action="{% url 'logout' %}">
+            <form id="logout-form" method="post" action="{% url 'logout' %}" class="w-full">
                 {% csrf_token %}
-                <button class="group after:content-['Log\00A0Out'] relative w-full p-1 flex justify-center hover:bg-blue-200 dark:hover:bg-violet-400 active:bg-blue-300 focus:bg-blue-200 dark:active:bg-violet-500 dark:focus:bg-violet-400 with-tooltip" :class="sidebarExpanded && 'justify-between after:hidden'">
-                    <i class="fa-solid fa-right-from-bracket text-blue-700 dark:text-violet-600 h-6 w-6 group-hover:text-blue-600 group-hover:dark:text-violet-500"></i>
+                <button class="group after:content-['Log\00A0Out'] relative w-full p-1 flex justify-center items-baseline hover:bg-violet-200 dark:hover:bg-violet-400 active:bg-violet-300 focus:bg-violet-200 dark:active:bg-violet-500 dark:focus:bg-violet-400 with-tooltip" :class="sidebarExpanded && 'justify-between after:hidden'">
+                    <i class="fa-solid fa-right-from-bracket text-violet-700 dark:text-violet-600 h-6 w-6 group-hover:text-violet-600 group-hover:dark:text-violet-500"></i>
                     <span x-show="sidebarExpanded" class="ml-2 hidden md:inline">Log Out</span>
                 </button>
             </form>

@@ -1,5 +1,5 @@
 from class_manager.views import ProjectListView, ProjectDetailView, ProjectCreateView, ProjectUpdateView, ModuleListView, ModuleDetailView, ModuleCreateView, ModuleUpdateView, ClassListView, ClassDetailView, ClassCreateView, ClassUpdateView, PropertyListView, PropertyDetailView, PropertyCreateView, PropertyUpdateView, MethodListView, MethodDetailView, MethodCreateView, MethodUpdateView, RelationshipListView, RelationshipDetailView, RelationshipCreateView, RelationshipUpdateView, DiagramView
-from django.urls import path
+from django.urls import path, resolve
 
 models = ["project", "module", "class", "property", "method", "relationship"]
 actions = ["list", "detail", "create", "update"]

@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse, resolve
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeletionMixin
 from .forms import RegistrationForm, UpdateUserForm, ProjectForm, ModuleForm, ClassForm, PropertyForm, MethodForm, RelationshipForm # , UserForm
 from .helpers import build_color_theme
 from .models import *
@@ -208,7 +208,9 @@ class OCDListMixin:
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["create_route"] = "class_manager:" + self.model.__name__.lower() + "-create"
-        context["detail_route"] = "class_manager" + self.model.__name__.lower() + "-detail"
+        context["detail_route"] = "class_manager:" + self.model.__name__.lower() + "-detail"
+        context["model_name"] = self.model._meta.verbose_name.title()
+        context["model_name_plural"] = self.model._meta.verbose_name_plural.title()
         return context
 
 class OCDDetailMixin:
@@ -217,42 +219,58 @@ class OCDDetailMixin:
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["create_route"] = "class_manager:" + self.model.__name__.lower() + "-create"
+        context["edit_route"] = "class_manager:" + self.model.__name__.lower() + "-update"
+        context["model_name"] = self.model._meta.verbose_name.title()
+        context["model_name_plural"] = self.model._meta.verbose_name_plural.title()
+        return context
     
 class OCDEditMixin:
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
     
+   
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["model_name"] = self.model._meta.verbose_name.title()
+        context["model_name_plural"] = self.model._meta.verbose_name_plural.title()
+        context["detail_route"] = "class_manager:" + self.model._meta.verbose_name.lower() + "-detail"
+        return context
+    
+    def get_success_url(self, *args, **kwargs):
+        model_name = self.model._meta.verbose_name
+        url_pattern = f"class_manager:{model_name}-detail"
+        print(f"PK: {self.object.pk}")
+        return reverse_lazy(url_pattern, kwargs={"pk": int(self.object.pk)})
 
-class OCDDeleteMixin:
+class OCDDeleteMixin(DeletionMixin):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["delete_route"] = self.request.path
         return context
 
-    def delete(self, request, *args, **kwargs):
+    def get_object(self, *args, **kwargs):
         model = self.model
-        try:
-            if 'pk' in kwargs:
-                obj = get_object_or_404(model, id=kwargs["pk"])
-            else:
-                id = request.GET.get("id")
-                if id is None:
-                    raise Http404
-                obj = get_object_or_404(model, id=int(id))
-            if hasattr(obj, "user") and self.request.user != obj.user:
+        obj = None
+        if 'pk' in kwargs:
+            obj = model.objects.get(pk=int(kwargs["pk"]))
+        else:
+            id = self.request.GET.get("pk")
+            if id is None:
+                id = self.kwargs.get("pk")
+            if id is None:
                 raise Http404
-            obj.delete()
-            if 'detail' in request.resolver_match.url_name:
-                return HttpResponse("OK", status=200)
-            return self.get(self.request)
-        except Exception as e:
-            print(e)
-            return HttpResponse(e, status=500)
+            obj = model.objects.get(pk=int(id))
+        return obj
+        
+    def get_success_url(self, *args, **kwargs):
+        url_pattern = "class_manager:" + self.model._meta.verbose_name + "-list"
+        return reverse_lazy(url_pattern)
         
 
 #================================#
@@ -309,48 +327,48 @@ class WorkbenchView(LoginRequiredMixin, TemplateView):
         classes = Class.objects.filter(user=self.request.user.id)
         properties = Property.objects.filter(user=self.request.user.id)
         methods = Method.objects.filter(user=self.request.user.id)
-        relationships = Relationship.objects.filter(from_model__in=classes)
+        relationships = Relationship.objects.filter( from_class__in=classes)
         context["data"] = {
             "projects": {
                 "icon_class": "fa-solid fa-list-check",
                 "list": "class_manager:project-list",
                 "add": "class_manager:project-create",
-                "details": Project.details,
+                "details": Project.details(),
                 "objects": projects
             },
             "modules": {
                 "icon_class": "fa-solid fa-robot",
                 "list": "class_manager:module-list",
                 "add": "class_manager:module-create",
-                "details": Module.details,
+                "details": Module.details(),
                 "objects": modules
             },
             "classes": {
                 "icon_class": "fa-solid fa-shapes",
                 "list": "class_manager:class-list",
                 "add": "class_manager:class-create",
-                "details": Class.details,
+                "details": Class.details(),
                 "objects": classes
             },
             "properties": {
                 "icon_class": "fa-solid fa-arrows-to-dot",
                 "list": "class_manager:property-list",
                 "add": "class_manager:property-create",
-                "details": Property.details,
+                "details": Property.details(),
                 "objects": properties
             },
             "methods": {
                 "icon_class": "fa-solid fa-rocket",
                 "list": "class_manager:method-list",
                 "add": "class_manager:method-create",
-                "details": Method.details,
+                "details": Method.details(),
                 "objects": methods
             },
             "relationships": {
                 "icon_class": "fa-solid fa-sitemap",
                 "list": "class_manager:relationship-list",
                 "add": "class_manager:relationship-create",
-                "details": Relationship.details,
+                "details": Relationship.details(),
                 "objects": relationships
             }
         }
@@ -380,10 +398,15 @@ class ProjectCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
         context["action"] = "class_manager:project-create"
         return context
 
-class ProjectUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, UpdateView):
+class ProjectUpdateView(LoginRequiredMixin, OCDEditMixin, UpdateView):
     model = Project
     form_class = ProjectForm
     template_name = "class_manager/update.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["action"] = "class_manager:project-update"
+        return context
 
 
 #================================#
@@ -400,7 +423,7 @@ class ModuleDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, Detai
     model = Module
 
     def get_queryset(self):
-        return Module.objects.prefetch_related("projects").filter(user=self.request.user.id)
+        return Module.objects.prefetch_related("projects").filter(pk=self.request.GET.get("pk"))
 
 class ModuleCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
     model = Module
@@ -413,7 +436,7 @@ class ModuleCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
         context["action"] = "class_manager:module-create"
         return context
 
-class ModuleUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, UpdateView):
+class ModuleUpdateView(LoginRequiredMixin, OCDEditMixin, UpdateView):
     model = Module
     form_class = ProjectForm
     template_name = "class_manager/update.html"
@@ -421,6 +444,7 @@ class ModuleUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, UpdateV
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["color_choices"] = DEFAULT_COLORS
+        context["action"] = "class_manager:module-update"
         return context
 
 
@@ -442,7 +466,7 @@ class ClassDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, Detail
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        relationship_form = RelationshipForm(initial={"from_model": self.object})
+        relationship_form = RelationshipForm(initial={" from_class": self.object})
         context["relationship_form"] = relationship_form
         return context
     
@@ -459,10 +483,15 @@ class ClassCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
         context["action"] = "class_manager:class-create"
         return context
 
-class ClassUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, UpdateView):
+class ClassUpdateView(LoginRequiredMixin, OCDEditMixin, UpdateView):
     model = Class
     form_class = ClassForm
     template_name = "class_manager/update.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["action"] = "class_manager:class-update"
+        return context
 
 
 #================================#
@@ -491,10 +520,15 @@ class PropertyCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
         context["action"] = "class_manager:property-create"
         return context
 
-class PropertyUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, UpdateView):
+class PropertyUpdateView(LoginRequiredMixin, OCDEditMixin, UpdateView):
     model = Property
     form_class = PropertyForm
     template_name = "class_manager/update.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["action"] = "class_manager:property-update"
+        return context
 
 
 #================================#
@@ -523,22 +557,27 @@ class MethodCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
         context["action"] = "class_manager:method-create"
         return context
 
-class MethodUpdateView(LoginRequiredMixin, OCDEditMixin, OCDDeleteMixin, UpdateView):
+class MethodUpdateView(LoginRequiredMixin, OCDEditMixin, UpdateView):
     model = Method
     form_class = MethodForm
     template_name = "class_manager/update.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["action"] = "class_manager:method-update"
+        return context
 
 
 #================================#
 #       RELATIONSHIP VIEWS       #
 #================================#
 
-class RelationshipListView(LoginRequiredMixin, OCDDeleteMixin, ListView):
+class RelationshipListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView):
     model = Relationship
     template_name = "class_manager/list.html"
 
     def get_queryset(self):
-        return Relationship.objects.select_related("from_class", "to_class").prefetch_related("from_class__module", "to_class__module").filter(user=self.request.user.id)
+        return Relationship.objects.select_related("from_class", "to_class").prefetch_related("from_class__module", "to_class__module").filter(from_class__user=self.request.user.id)
 
 class RelationshipDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Relationship
@@ -558,18 +597,23 @@ class RelationshipCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         if self.request.POST.get("page", "relationship-detail") == "class-detail":
-            return reverse("class-detail", kwargs={"pk": self.object.from_model.id})
+            return reverse("class-detail", kwargs={"pk": self.object. from_class.id})
         else:
             return reverse("relationship-detail", kwargs={"pk", self.object.id})
 
-class RelationshipUpdateView(LoginRequiredMixin, OCDDeleteMixin, UpdateView):
+class RelationshipUpdateView(LoginRequiredMixin, UpdateView):
     model = Relationship
     form_class = RelationshipForm
     template_name = "class_manager/update.html"
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["action"] = "class_manager:relationship-update"
+        return context
+
     def get_success_url(self):
         if self.request.POST.get("page", "relationship-detail") == "class-detail":
-            return reverse("class-detail", kwargs={"pk": self.object.from_model.id})
+            return reverse("class-detail", kwargs={"pk": self.object. from_class.id})
         else:
             return reverse("relationship-detail", kwargs={"pk", self.object.id})
         

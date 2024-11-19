@@ -9,7 +9,7 @@ body {
 }
 
 .with-tooltip {
-    @apply z-30 after:bg-blue-300 after:dark:bg-violet-300 after:text-slate-800 after:text-xs after:font-semibold after:transition-opacity after:duration-300 after:rounded after:absolute after:z-40 after:-top-6 after:left-3/4 after:px-2 after:py-1 after:opacity-0 hover:after:opacity-100;
+    @apply z-30 after:bg-violet-300 after:dark:bg-violet-300 after:text-slate-800 after:text-xs after:font-semibold after:transition-opacity after:duration-300 after:rounded after:absolute after:z-40 after:-top-6 after:left-3/4 after:px-2 after:py-1 after:opacity-0 hover:after:opacity-100;
 }
 
 
@@ -63,15 +63,15 @@ h6 {
 }
 
 .btn.primary, .btn-square.primary, .btn-flex.primary {
-    @apply bg-blue-700 dark:bg-violet-700 hover:bg-blue-600 focus:border-blue-200 disabled:bg-blue-300 dark:text-slate-300 dark:hover:bg-violet-600 dark:focus:border-violet-400 dark:disabled:bg-violet-300 active:bg-blue-800 dark:active:bg-violet-800;
+    @apply bg-violet-700 dark:bg-violet-700 hover:bg-violet-600 focus:border-violet-200 disabled:bg-violet-300 dark:text-slate-300 dark:hover:bg-violet-600 dark:focus:border-violet-400 dark:disabled:bg-violet-300 active:bg-violet-800 dark:active:bg-violet-800;
 }
 
 input, select, textarea {
-    @apply static rounded-lg border border-slate-400 dark:border-slate-500 placeholder-slate-400 disabled:bg-slate-300 dark:disabled:bg-slate-600 focus:ring-blue-700 dark:focus:ring-violet-600 disabled:pointer-events-none disabled:cursor-not-allowed bg-white dark:bg-slate-900 w-full;
+    @apply static rounded-lg border border-slate-400 dark:border-slate-500 placeholder-slate-400 disabled:bg-slate-300 dark:disabled:bg-slate-600 focus:ring-violet-700 dark:focus:ring-violet-600 disabled:pointer-events-none disabled:cursor-not-allowed bg-white dark:bg-slate-900 w-full;
 }
 
 input[required], textarea[required], select[required] {
-    @apply border-slate-400 dark:border-slate-500 focus:ring-blue-700 dark:focus:ring-violet-600 ;
+    @apply border-slate-400 dark:border-slate-500 focus:ring-violet-700 dark:focus:ring-violet-600 ;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -83,11 +83,15 @@ input.invalid, textarea.invalid, select.invalid {
 }
 
 input, textarea {
-    @apply cursor-text focus:caret-blue-700 dark:focus:caret-violet-600;
+    @apply cursor-text focus:caret-violet-700 dark:focus:caret-violet-600;
 }
 
 input.invalid, textarea.invalid {
     @apply caret-red-700 dark:caret-red-600;
+}
+
+[type="checkbox"] {
+    @apply checked:bg-violet-700 dark:checked:bg-violet-700;
 }
 
 select {
@@ -119,7 +123,7 @@ ul.errorlist {
 }
 
 .helptext {
-    @apply ml-2 md:ml-3 xl:ml-4 text-blue-700 dark:text-violet-600 flex-wrap;
+    @apply ml-2 md:ml-3 xl:ml-4 text-violet-700 dark:text-violet-600 flex-wrap;
 }
 
 .form-grid {
@@ -129,6 +133,10 @@ ul.errorlist {
 fieldset {
     @apply border-slate-400 p-2 border-2;
     border-style:groove;
+}
+
+.jscolor-picker {
+    @apply bg-white dark:bg-slate-800;
 }
 
 
@@ -146,8 +154,16 @@ tr {
     @apply border-t border-t-slate-400 dark:border-t-slate-500 p-2 sm:p-3 lg:p-4
 }
 
+th {
+    @apply bg-slate-100 dark:bg-slate-700
+}
+
 th, td {
     @apply px-1 sm:px-2 sm:py-1 md:px-3 md:py-2 xl:px-4 xl:py-3;
+}
+
+tr > th {
+    @apply text-start;
 }
 
 td.link {
@@ -177,9 +193,9 @@ td > a {
 /* NAV */
 
 nav > div > a {
-    @apply relative w-full p-1 flex justify-center hover:bg-blue-200 dark:hover:bg-violet-400 active:bg-blue-300 focus:bg-blue-200 dark:active:bg-violet-500 dark:focus:bg-violet-400 with-tooltip;
+    @apply relative w-full p-1 flex justify-center hover:bg-violet-200 dark:hover:bg-violet-400 active:bg-violet-300 focus:bg-violet-200 dark:active:bg-violet-500 dark:focus:bg-violet-400 with-tooltip;
 }
 
 nav > div > a > i {
-    @apply text-blue-700 dark:text-violet-600 h-6 w-6 group-hover:text-blue-600 group-hover:dark:text-violet-500;
+    @apply text-violet-700 dark:text-violet-600 h-6 w-6 group-hover:text-violet-600 group-hover:dark:text-violet-500;
 }

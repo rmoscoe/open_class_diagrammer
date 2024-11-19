@@ -6,6 +6,10 @@ from django.forms import ModelForm
 from .helpers import prepare_dict_for_form
 from .models import *
 
+class MultipleInstanceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return getattr(obj, "name", obj.id)
+
 class RegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=40, required=True)
     last_name = forms.CharField(max_length=40, required=True)
@@ -56,10 +60,10 @@ class UpdateUserForm(ModelForm):
         return password2
 
 class ProjectForm(ModelForm):
-    modules = forms.ModelMultipleChoiceField(queryset=Module.objects.none(), widget=forms.CheckboxSelectMultiple)
+    modules = MultipleInstanceField(queryset=Module.objects.none(), widget=forms.CheckboxSelectMultiple, required=False)
 
     def __init__(self, *args, request=None, **kwargs):
-        self.user = kwargs.get("user", None)
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
         self.request = request
 
@@ -69,17 +73,17 @@ class ProjectForm(ModelForm):
         if request is not None and request.resolver_match.url_name == "project-update":
             instance = kwargs.get("instance")
             for field in self.fields.keys():
-                self.field[field].initial = instance[field]
+                self.fields[field].initial = instance[field]
 
     class Meta:
         model = Project
         fields = ["name", "description", "modules"]
 
 class ModuleForm(ModelForm):
-    projects = forms.ModelMultipleChoiceField(queryset=Module.objects.none(), widget=forms.CheckboxSelectMultiple)
+    projects = MultipleInstanceField(queryset=Module.objects.none(), widget=forms.CheckboxSelectMultiple)
 
     def __init__(self, *args, request=None, **kwargs):
-        self.user = kwargs.get("user", None)
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
         self.request = request
 
@@ -105,7 +109,7 @@ class PropertyForm(ModelForm):
     data_type = forms.MultipleChoiceField(choices=prepare_dict_for_form(DATA_TYPE_CHOICES), widget=forms.CheckboxSelectMultiple)
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.get("user", None)
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
         
         if self.user is not None:
@@ -123,7 +127,7 @@ class MethodForm(ModelForm):
     class_assoc = forms.ModelChoiceField(queryset=Class.objects.none(), widget=forms.Select, label="Class")
     
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.get("user", None)
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
         if self.user is not None:

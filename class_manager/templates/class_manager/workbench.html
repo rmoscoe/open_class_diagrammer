@@ -7,7 +7,7 @@
     <section class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 2xl:gap-10 3xl:gap-12 mt-4 sm:mt-5 md:mt-6 lg:mt-8 xl:mt-10 2xl:mt-12">
         {% for object_type, content in data.items %}
         <div class="shadow-md dark:shadow-violet-800 border border-slate-300 dark:border-slate-400 rounded-md overflow-hidden">
-            <header class="bg-blue-700 dark:bg-violet-700 w-full p-1 md:p-2 lg:px-3 rounded-t-md">
+            <header class="bg-violet-700 dark:bg-violet-700 w-full p-1 md:p-2 lg:px-3 rounded-t-md">
                 <h3 class="space-x-2 md:space-x-3 xl:space-x-4 flex items-center text-slate-100">
                     <i class="{{ content.icon_class }}"></i>
                     <span>{{ object_type | title }}</span>
@@ -26,7 +26,7 @@
                     </a>
                 </div>
                 <details class="p-1 sm:p-2 md:p-3 xl:p-4 3xl:p-5 col-span-3 lg:col-span-2 xl:col-span-3">
-                    <summary class="marker:text-blue-700 dark:marker:text-violet-500">
+                    <summary class="marker:text-violet-700 dark:marker:text-violet-500">
                         <h4 class="inline">Description</h4>
                     </summary>
                     <p>{{ content.details }}</p>

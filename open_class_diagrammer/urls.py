@@ -17,7 +17,7 @@ Including another URLconf
 from class_manager.views import HomePageView, SignupView, OpenClassDiagrammerLoginView, UserUpdateView, UserDetailView, WorkbenchView
 from django.contrib import admin
 from django.contrib.auth.views import LogoutView
-from django.urls import path, include
+from django.urls import path, include, resolve
 
 urlpatterns = [
     path('admin/', admin.site.urls),
