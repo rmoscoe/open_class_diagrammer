@@ -7,7 +7,11 @@
         <h2 class="text-center">Update {{ model_name }} {{ object.id }}</h2>
         <h3 class="text-center">{{ object.name|title }}</h3>
         {% csrf_token %}
-        {{ form.as_div }}
+        {% for field in form %}
+        <div class="field-wrapper group">
+            {{ field.as_field_group }}
+        </div>
+        {% endfor %}
         {% if form.errors %}
         <div>
             <p class="text-red-500 dark:text-red-600 text-sm md:text-base">Please correct the following errors:</p>

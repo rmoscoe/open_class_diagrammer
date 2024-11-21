@@ -12,6 +12,10 @@ body {
     @apply z-30 after:bg-violet-300 after:dark:bg-violet-300 after:text-slate-800 after:text-xs after:font-semibold after:transition-opacity after:duration-300 after:rounded after:absolute after:z-40 after:-top-6 after:left-3/4 after:px-2 after:py-1 after:opacity-0 hover:after:opacity-100;
 }
 
+.tooltip {
+    @apply bg-violet-300 dark:bg-violet-300 text-slate-800 text-xs font-semibold transition-opacity duration-300 rounded absolute z-40 left-3/4 px-2 py-1 md:text-nowrap;
+}
+
 
 /* HEADINGS */
 
@@ -123,7 +127,7 @@ ul.errorlist {
 }
 
 .helptext {
-    @apply ml-2 md:ml-3 xl:ml-4 text-violet-700 dark:text-violet-600 flex-wrap;
+    @apply ml-2 md:ml-3 xl:ml-4 text-violet-700 dark:text-violet-600 flex-wrap group-focus-within:flex;
 }
 
 .form-grid {

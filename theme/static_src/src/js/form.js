@@ -2,8 +2,14 @@ window.onload = () => {
     const formDivs = Array.from(document.querySelectorAll("form > div")).concat(Array.from(document.querySelectorAll("form > fieldset > div")));
     formDivs.forEach(div => {
         const label = div.querySelector("label");
-        const input = div.querySelector("input");
-        if (input?.hasAttribute("required")) {
+        const input = div.querySelector("['name']");
+        const select = div.querySelector("select");
+        const textarea = div.querySelector("textarea");
+
+        const field = input ?? select ?? textarea;
+        console.log(`Field: ${field}`);
+
+        if (field?.hasAttribute("required")) {
             label.classList.add("font-bold");
             const labelText = label.innerText;
             let newLabel = "";
@@ -14,15 +20,15 @@ window.onload = () => {
             label.innerText = newLabel;
         }
 
-        const errorList = div.querySelector("ul.errorlist");
-        if (input && errorList) {
-            input?.classList.add("invalid");
-        } else {
-            input?.classList.remove("invalid");
-        }
+        // const errorList = div.querySelector("ul.errorlist");
+        // if (input && errorList) {
+        //     input?.classList.add("invalid");
+        // } else {
+        //     input?.classList.remove("invalid");
+        // }
 
         const helpText = div.querySelector(".helptext");
-        if (input?.matches(":focus")) {
+        if (field?.matches(":focus")) {
             helpText?.classList.remove("hidden");
             helpText?.classList.add("flex");
         } else {
@@ -32,7 +38,7 @@ window.onload = () => {
 
         input?.addEventListener("focusout", (event) => {
             if (!event.relatedTarget || !event.relatedTarget.closest('a[href]')) {
-                input?.classList.remove("invalid");
+                field?.classList.remove("invalid");
                 errorList?.remove();
                 helpText?.classList.add("hidden");
                 helpText?.classList.remove("flex");

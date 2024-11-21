@@ -132,7 +132,7 @@ class Class(Model):
     name = models.CharField(max_length=160, help_text="The name of the class.")
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     module = models.ForeignKey(Module, on_delete=models.SET_NULL, null=True, blank=True, help_text="The module to which this class belongs.")
-    relationships = models.ManyToManyField("self", through="Relationship", symmetrical=False, help_text="Related class(es).")
+    relationships = models.ManyToManyField("self", through="Relationship", symmetrical=False, help_text="Related class(es).", blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     last_modified_at = models.DateTimeField(auto_now=True, blank=True)
 
@@ -147,7 +147,9 @@ class BaseAttribute(Model):
     name = models.CharField(max_length=160)
     class_assoc = models.ForeignKey(Class, on_delete=models.CASCADE, help_text="The class that contains this attribute.")
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
-    visibility = models.CharField(max_length=80, choices=get_visibility_choices, help_text="Public (+): visible to any object that can view the class\n\nProtected (#): visible to objects that can view the class and are derived from the class\n\nPrivate (-): visibile only within the class and its instances")
+    visibility = models.CharField(max_length=80, choices=get_visibility_choices, help_text="Public (+): visible to any object that can view the class\n\nProtected (#): visible to objects that can view the class and are derived from the class\n\nPrivate (-): visibile only within the class and its instances", null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    last_modified_at = models.DateTimeField(auto_now=True, blank=True)
 
 class Property(BaseAttribute):
     data_type = models.CharField(max_length=255, null=True, blank=True, help_text="The data type (e.g., string, integer, Boolean, list, dictionary) of the property.")
@@ -176,6 +178,8 @@ class Relationship(Model):
     from_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="from_class", help_text="The class in which the relationship originates.")
     to_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="to_class", help_text="The class to which the From Class is related.")
     relationship_type = models.CharField(max_length=80, choices=get_relationship_type_choices, help_text="The nature of the relationship between the classes (e.g., inheritance, composition, or cardinality, such as \"one-to-one\" or \"one-to-many\").")
+    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    last_modified_at = models.DateTimeField(auto_now=True, blank=True)
     
     @classmethod
     def details(cls):

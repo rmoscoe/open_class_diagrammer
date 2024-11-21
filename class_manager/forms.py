@@ -9,11 +9,16 @@ from .models import *
 class MultipleInstanceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
         return getattr(obj, "name", obj.id)
+    
+class ModelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.name
 
 class RegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=40, required=True)
     last_name = forms.CharField(max_length=40, required=True)
     email = forms.EmailField(required=True)
+    error_css_class = "invalid"
 
     class Meta:
         model = User
@@ -38,6 +43,7 @@ class RegistrationForm(UserCreationForm):
 class UpdateUserForm(ModelForm):
     password1 = forms.CharField(label="New Password", widget=forms.PasswordInput, required=False)
     password2 = forms.CharField(label="Confirm New Password", widget=forms.PasswordInput, required=False)
+    error_css_class = "invalid"
 
     class Meta:
         model = User
@@ -61,6 +67,7 @@ class UpdateUserForm(ModelForm):
 
 class ProjectForm(ModelForm):
     modules = MultipleInstanceField(queryset=Module.objects.none(), widget=forms.CheckboxSelectMultiple, required=False)
+    error_css_class = "invalid"
 
     def __init__(self, *args, request=None, **kwargs):
         self.user = kwargs.pop("user", None)
@@ -81,6 +88,7 @@ class ProjectForm(ModelForm):
 
 class ModuleForm(ModelForm):
     projects = MultipleInstanceField(queryset=Module.objects.none(), widget=forms.CheckboxSelectMultiple)
+    error_css_class = "invalid"
 
     def __init__(self, *args, request=None, **kwargs):
         self.user = kwargs.pop("user", None)
@@ -93,27 +101,51 @@ class ModuleForm(ModelForm):
         if request is not None and request.resolver_match.url_name == "module-update":
             instance = kwargs.get("instance")
             for field in self.fields.keys():
-                self.field[field].initial = instance[field]
+                self.fields[field].initial = instance[field]
 
     class Meta:
         model = Module
         fields = ["name", "description", "projects", "color"]
 
 class ClassForm(ModelForm):
+    module = ModelChoiceField(queryset=Module.objects.none())
+    error_css_class = "invalid"
+
     class Meta:
         model = Class
-        fields = ["name", "module", "relationships"]
+        fields = ["name", "module"]
+    
+    def __init__(self, *args, request=None, **kwargs):
+        self.user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+        self.request = request
+        if self.user:
+            self.fields['module'].queryset = Module.objects.filter(user=self.user)
+        if request and request.resolver_match.url_name == "class-update":
+            instance = kwargs.get("instance")
+            for field in self.fields.keys():
+                self.fields[field].initial = instance[field] 
 
 class PropertyForm(ModelForm):
-    class_assoc = forms.ModelChoiceField(queryset=Class.objects.none(), widget=forms.Select, label="Class")
+    class_assoc = ModelChoiceField(queryset=Class.objects.none(), widget=forms.Select, label="Class")
     data_type = forms.MultipleChoiceField(choices=prepare_dict_for_form(DATA_TYPE_CHOICES), widget=forms.CheckboxSelectMultiple)
+    error_css_class = "invalid"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, request=None, **kwargs):
         self.user = kwargs.pop("user", None)
+        instance = kwargs.get("instance")
         super().__init__(*args, **kwargs)
         
         if self.user is not None:
             self.fields["class_assoc"].queryset = Class.objects.filter(user=self.user)
+        if request and request.resolver_match.url_name == "property-update" and instance:
+            if hasattr(instance, "data_type") and instance.data_type:
+                existing_types = instance.data_type.split(" | ")
+                valid_choices = [choice[0] for choice in self.fields['data_type'].choices]
+                self.initial["data_type"] = [choice for choice in existing_types if choice in valid_choices]
+            for field in self.fields.keys():
+                if field != "data_type":
+                    self.fields[field].initial = getattr(instance, field)
     
     def clean_data_type(self):
         selected_choices = self.cleaned_data["data_type"]
@@ -124,7 +156,8 @@ class PropertyForm(ModelForm):
         fields = ["name", "class_assoc", "visibility", "data_type"]
 
 class MethodForm(ModelForm):
-    class_assoc = forms.ModelChoiceField(queryset=Class.objects.none(), widget=forms.Select, label="Class")
+    class_assoc = ModelChoiceField(queryset=Class.objects.none(), widget=forms.Select, label="Class")
+    error_css_class = "invalid"
     
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
@@ -138,6 +171,8 @@ class MethodForm(ModelForm):
         fields = ["name", "class_assoc", "visibility", "arguments", "return_type"]
 
 class RelationshipForm(ModelForm):
+    error_css_class = "invalid"
+    
     class Meta:
         model = Relationship
         fields = ["from_class", "to_class", "relationship_type"]

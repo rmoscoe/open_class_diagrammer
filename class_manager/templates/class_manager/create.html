@@ -6,7 +6,11 @@
     <form id="create-form" method="post" action="{% url action %}" class="mx-0 md:mx-auto rounded-md lg:rounded-lg p-4 md:p-8 lg:p-12 xl:p-16 w-full md:w-4/5 lg:w-2/3 xl:w-1/2 space-y-4 lg:space-y-6 shadow-md md:shadow-lg lg:shadow-xl bg-slate-100 dark:bg-slate-700 dark:shadow-violet-800">
         <h2 class="text-center">New {{ model_name }}</h2>
         {% csrf_token %}
-        {{ form.as_div }}
+        {% for field in form %}
+        <div class="field-wrapper group">
+            {{ field.as_field_group }}
+        </div>
+        {% endfor %}
         {% if form.errors %}
         <div>
             <p class="text-red-500 dark:text-red-600 text-sm md:text-base">Please correct the following errors:</p>

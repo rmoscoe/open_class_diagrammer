@@ -233,6 +233,7 @@ class OCDEditMixin:
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
+        kwargs["request"] = self.request
         return kwargs
     
     def get_context_data(self, *args, **kwargs):
@@ -258,14 +259,24 @@ class OCDDeleteMixin(DeletionMixin):
         model = self.model
         obj = None
         if 'pk' in kwargs:
-            obj = model.objects.get(pk=int(kwargs["pk"]))
+            pk = None
+            try:
+                pk = int(kwargs['pk'])
+            except Exception:
+                pk = kwargs['pk']
+            obj = model.objects.get(pk=pk)
         else:
             id = self.request.GET.get("pk")
             if id is None:
                 id = self.kwargs.get("pk")
             if id is None:
                 raise Http404
-            obj = model.objects.get(pk=int(id))
+            pk = None
+            try:
+                pk = int(id)
+            except Exception:
+                pk = id
+            obj = model.objects.get(pk=pk)
         return obj
         
     def get_success_url(self, *args, **kwargs):
@@ -438,7 +449,7 @@ class ModuleCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
 
 class ModuleUpdateView(LoginRequiredMixin, OCDEditMixin, UpdateView):
     model = Module
-    form_class = ProjectForm
+    form_class = ModuleForm
     template_name = "class_manager/update.html"
     
     def get_context_data(self, *args, **kwargs):
@@ -471,7 +482,9 @@ class ClassDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, Detail
         return context
     
     def get_success_url(self):
-        return reverse("class-detail", kwargs={"pk": self.object.id})
+        list = reverse("class_manager:class-list")
+        detail = reverse("class_manager:class-detail", kwargs={"pk": self.object.id})
+        return list if "submit-delete-form" in self.request.POST else detail
 
 class ClassCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
     model = Class

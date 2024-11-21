@@ -69,11 +69,11 @@
                     <td class="text-left">
                         <ul class="list-disc list-outside ml-4">
                             {% if model_name == "Module" %}
-                                {% for project in obj.projects %}
+                                {% for project in obj.projects.all %}
                                 <li>{{ project.name }}</li>
                                 {% endfor %}
                             {% elif model_name == "Class" %}
-                                {% for project in obj.module.projects %}
+                                {% for project in obj.module.projects.all %}
                                 <li>{{ project.name }}</li>
                                 {% endfor %}
                             {% endif %}
