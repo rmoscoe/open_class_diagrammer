@@ -111,13 +111,13 @@
                     </td>
                 </tr>
                 {% endif %}
-                {% if object.data_type %}
+                {% if model_name == "Property" %}
                 <tr>
                     <th>Data Type</th>
                     <td>{{ object.data_type }}</td>
                 </tr>
                 {% endif %}
-                {% if object.arguments %}
+                {% if model_name == "Method" %}
                 <tr x-data="{ showTooltip: false }">
                     <th>Arguments</th>
                     <td class="relative" @mouseenter="showTooltip = true; $nextTick(() => {const tooltip = $el.querySelector('.tooltip'); const tooltipRect = tooltip.getBoundingClientRect(); const viewportWidth = document.documentElement.clientWidth; if (tooltipRect.right >= viewportWidth) {const overflow = tooltipRect.right - viewportWidth; tooltip.style.left = `calc(75% - ${overflow}px - 1rem)`;}; const h = tooltip.offsetHeight; tooltip.style.top = `-${h + 4}px`})" @mouseleave="showTooltip = false; const tooltip = $el.querySelector('.tooltip'); tooltip.style.left = ''">

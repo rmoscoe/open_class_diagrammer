@@ -2,14 +2,13 @@ window.onload = () => {
     const formDivs = Array.from(document.querySelectorAll("form > div")).concat(Array.from(document.querySelectorAll("form > fieldset > div")));
     formDivs.forEach(div => {
         const label = div.querySelector("label");
-        const input = div.querySelector("['name']");
-        const select = div.querySelector("select");
-        const textarea = div.querySelector("textarea");
+        const input = div.querySelector("[name]");
+        // const select = div.querySelector("select");
+        // const textarea = div.querySelector("textarea");
 
-        const field = input ?? select ?? textarea;
-        console.log(`Field: ${field}`);
+        // const field = input ?? select ?? textarea;
 
-        if (field?.hasAttribute("required")) {
+        if (input?.hasAttribute("required")) {
             label.classList.add("font-bold");
             const labelText = label.innerText;
             let newLabel = "";
@@ -28,7 +27,7 @@ window.onload = () => {
         // }
 
         const helpText = div.querySelector(".helptext");
-        if (field?.matches(":focus")) {
+        if (input?.matches(":focus")) {
             helpText?.classList.remove("hidden");
             helpText?.classList.add("flex");
         } else {
@@ -38,8 +37,8 @@ window.onload = () => {
 
         input?.addEventListener("focusout", (event) => {
             if (!event.relatedTarget || !event.relatedTarget.closest('a[href]')) {
-                field?.classList.remove("invalid");
-                errorList?.remove();
+                input?.classList.remove("invalid");
+                // errorList?.remove();
                 helpText?.classList.add("hidden");
                 helpText?.classList.remove("flex");
             }

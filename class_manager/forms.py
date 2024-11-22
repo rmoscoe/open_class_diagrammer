@@ -159,19 +159,68 @@ class MethodForm(ModelForm):
     class_assoc = ModelChoiceField(queryset=Class.objects.none(), widget=forms.Select, label="Class")
     error_css_class = "invalid"
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, request=None, **kwargs):
         self.user = kwargs.pop("user", None)
+        instance = kwargs.get("instance")
         super().__init__(*args, **kwargs)
 
         if self.user is not None:
             self.fields["class_assoc"].queryset = Class.objects.filter(user=self.user)
+        if request and request.resolver_match.url_name == "method-update" and instance:
+            for field in self.fields.keys():
+                self.fields[field].initial = getattr(instance, field)
     
     class Meta:
         model = Method
         fields = ["name", "class_assoc", "visibility", "arguments", "return_type"]
 
 class RelationshipForm(ModelForm):
+    from_class = ModelChoiceField(queryset=Class.objects.none(), widget=forms.Select)
+    to_class = ModelChoiceField(queryset=Class.objects.none(), widget=forms.Select)
     error_css_class = "invalid"
+
+    def __init__(self, *args, request=None, **kwargs):
+        self.user = kwargs.pop("user", None)
+        instance = kwargs.get("instance")
+        super().__init__(*args, **kwargs)
+
+        class_queryset = None
+        if self.user is not None:
+            class_queryset = Class.objects.filter(user=self.user)
+        else:
+            print("User not given!")
+            class_queryset = Class.objects.all()
+        if request and request.resolver_match.url_name == "relationship-update" and instance:
+            for field in self.fields.keys():
+                self.fields[field].initial = getattr(instance, field)
+        to_class_queryset = None
+        if self.fields["from_class"].initial:
+            f_class = None
+            if self.user is not None:
+                f_class = Class.objects.filter(user=self.user, name=self.fields["from_class"].initial).first()
+            else:
+                f_class = Class.objects.filter(name=self.fields["from_class"].initial).first()
+            f_module = f_class.module
+            to_class_queryset = Class.objects.filter(module=f_module)
+        elif self.user is not None:
+            to_class_queryset = Class.objects.filter(user=self.user)
+        else:
+            to_class_queryset = Class.objects.all()
+        self.fields["to_class"].queryset = to_class_queryset
+        from_class_queryset = None
+        if self.fields["to_class"].initial:
+            t_class = None
+            if self.user is not None:
+                t_class = Class.objects.filter(user=self.user, name=self.fields["to_class"].initial).first()
+            else:
+                t_class = Class.objects.filter(name=self.fields["to_class"].initial).first()
+            t_module = t_class.module
+            from_class_queryset = Class.objects.filter(module=t_module)
+        elif self.user is not None:
+            from_class_queryset = Class.objects.filter(user=self.user)
+        else:
+            from_class_queryset = Class.objects.all()
+        self.fields["from_class"].queryset = from_class_queryset
     
     class Meta:
         model = Relationship

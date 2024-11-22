@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse, resolve
@@ -10,7 +11,9 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeletionMixin
 from .forms import RegistrationForm, UpdateUserForm, ProjectForm, ModuleForm, ClassForm, PropertyForm, MethodForm, RelationshipForm # , UserForm
 from .helpers import build_color_theme
+import json
 from .models import *
+from uuid import UUID
 
 # Create your views here.
 DEFAULT_COLORS = {
@@ -192,6 +195,12 @@ DEFAULT_COLORS = {
 #             MIXINS             #
 #================================#
 
+class CustomJSONEncoder(DjangoJSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, UUID):
+            return str(obj)
+        return super().default(obj)
+
 class AnonymousUserMixin(UserPassesTestMixin):
     def test_func(self):
         return not self.request.user.is_authenticated
@@ -241,6 +250,12 @@ class OCDEditMixin:
         context["model_name"] = self.model._meta.verbose_name.title()
         context["model_name_plural"] = self.model._meta.verbose_name_plural.title()
         context["detail_route"] = "class_manager:" + self.model._meta.verbose_name.lower() + "-detail"
+        if self.model._meta.verbose_name.lower() == "relationship":
+            classes = Class.objects.filter(user=self.request.user).values("id", "name", "module")
+            context["all_classes"] = []
+            for cls in classes:
+                cls_dict = {k: str(v) for k, v in cls.items()}
+                context["all_classes"].append(cls_dict)
         return context
     
     def get_success_url(self, *args, **kwargs):
@@ -598,7 +613,7 @@ class RelationshipDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin,
     def get_queryset(self):
         return Relationship.objects.select_related("from_class", "to_class").prefetch_related("from_class__module", "to_class__module").filter(user=self.request.user.id)
 
-class RelationshipCreateView(LoginRequiredMixin, CreateView):
+class RelationshipCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
     model = Relationship
     form_class = RelationshipForm
     template_name = "class_manager/create.html"
@@ -614,7 +629,7 @@ class RelationshipCreateView(LoginRequiredMixin, CreateView):
         else:
             return reverse("relationship-detail", kwargs={"pk", self.object.id})
 
-class RelationshipUpdateView(LoginRequiredMixin, UpdateView):
+class RelationshipUpdateView(LoginRequiredMixin, OCDEditMixin, UpdateView):
     model = Relationship
     form_class = RelationshipForm
     template_name = "class_manager/update.html"
