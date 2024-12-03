@@ -1,98 +1,60 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static is_instance has %}
 
 {% block page %}
 <section class="grow basis-full mx-4 mt-5 sm:mt-6 md:mx-5 md:mt-8 lg:mx-6 lg:mt-10 2xl:mx-8 2xl:mt-12" x-cloak>
-    <form id="create-form" method="post" action="{% url action %}" class="mx-0 md:mx-auto rounded-md lg:rounded-lg p-4 md:p-8 lg:p-12 xl:p-16 w-full md:w-4/5 lg:w-2/3 xl:w-1/2 space-y-4 lg:space-y-6 shadow-md md:shadow-lg lg:shadow-xl bg-slate-100 dark:bg-slate-700 dark:shadow-violet-800"
-        {% if model_name == 'Relationship' %}
-        x-data="{
-            allClasses: {{ all_classes }},
-            selectedFromClass: {% if form.from_class.value %}'{{ form.from_class.value }}'{% else %}''{% endif %},
-            selectedToClass: {% if form.to_class.value %}'{{ form.to_class.value }}'{% else %}''{% endif %},
-            fromClassOptions: {{ all_classes }},
-            toClassOptions: {{ all_classes }},
-            
-            updateToClasses() {
-                if (this.selectedFromClass) {
-                    const selectedClass = this.allClasses.find(cls => cls.id == this.selectedFromClass)
-                    if (selectedClass) {
-                        this.toClassOptions = this.allClasses.filter(cls => 
-                            cls.module === selectedClass.module
-                        )
-                    }
-                } else {
-                    this.toClassOptions = this.allClasses
-                }
-            },
-            
-            updateFromClasses() {
-                if (this.selectedToClass) {
-                    const selectedClass = this.allClasses.find(cls => cls.id == this.selectedToClass)
-                    if (selectedClass) {
-                        this.fromClassOptions = this.allClasses.filter(cls => 
-                            cls.module === selectedClass.module
-                        )
-                    }
-                } else {
-                    this.fromClassOptions = this.allClasses
-                }
-            }
-        }"
-        x-init="() => {$nextTick(() => {if (selectedFromClass) updateToClasses(); if (selectedToClass) updateFromClasses();})}"
-        {% endif %}>
+    <form id="create-form" method="post" action="{% url action %}" class="mx-0 md:mx-auto rounded-md lg:rounded-lg p-4 md:p-8 lg:p-12 xl:p-16 w-full md:w-4/5 lg:w-2/3 xl:w-1/2 space-y-4 lg:space-y-6 shadow-md md:shadow-lg lg:shadow-xl bg-slate-100 dark:bg-slate-700 dark:shadow-violet-800">
         <h2 class="text-center">New {{ model_name }}</h2>
         {% csrf_token %}
         {% for field in form %}
         <div class="field-wrapper group">
-        {% if model_name == "Relationship" %}
             {% if field.name == 'from_class' %}
-                <div x-data>
-                    <template x-if="false">
-                        <!-- This keeps the original select for form submission but hides it -->
-                        {{ field.as_field_group }}
-                    </template>
-                    <label for="id_from_class">From Class</label>
-                    <select 
-                        id="id_from_class"
-                        name="from_class"
-                        x-model="selectedFromClass"
-                        @change="updateToClasses()"
-                        class="form-select w-full"
-                        required
-                    >
-                        <option value="">Select From Class</option>
-                        <template x-for="cls in fromClassOptions" x-bind:key="`from-${cls.id}`">
-                            <option :value="cls.id" x-text="cls.name"></option>
-                        </template>
-                    </select>
-                </div>
+                <label for="id_from_class">From Class</label>
+                <select 
+                    id="id_from_class" 
+                    name="from_class" 
+                    class="form-select w-full"
+                    x-data="{ updateUrl: '{% url 'class_manager:filtered-classes' %}' }"
+                    @change="async () => {
+                        const selectedClass = $el.value;
+                        const toClassSelect = document.getElementById('id_to_class');
+                        toClassSelect.innerHTML = '';
+                        const defaultOpt = document.createElement('option');
+                        defaultOpt.value = '';
+                        defaultOpt.textContent = 'Select To Class';
+                        toClassSelect.appendChild(defaultOpt);
+                        if (selectedClass) {
+                            const response = await fetch(`${updateUrl}?class_id=${$el.value}`);
+                            const classes = await response.json();
+                            classes.forEach(cls => {
+                                const option = document.createElement('option');
+                                option.value = cls.id;
+                                option.textContent = cls.name;
+                                toClassSelect.appendChild(option);
+                            });
+                        }
+                    }"
+                >
+                    <option value="">Select From Class</option>
+                    {% for cls in form.fields.from_class.queryset %}
+                    <option value="{{ cls.id }}" {% if cls.id == form.initial.from_class %}selected{% endif %}>
+                        {{ cls.name }}
+                    </option>
+                    {% endfor %}
+                </select>
             {% elif field.name == 'to_class' %}
-                <div x-data>
-                    <template x-if="false">
-                        <!-- This keeps the original select for form submission but hides it -->
-                        {{ field.as_field_group }}
-                    </template>
-                    <label for="id_to_class">To Class</label>
-                    <select 
-                        id="id_to_class"
-                        name="to_class"
-                        x-model="selectedToClass"
-                        @change="updateFromClasses()"
-                        class="form-select w-full"
-                        required
-                    >
-                        <option value="">Select To Class</option>
-                        <template x-for="cls in toClassOptions" :key="cls.id">
-                            <option :value="cls.id" x-text="cls.name"></option>
-                        </template>
-                    </select>
-                </div>
+                <label for="id_to_class">To Class</label>
+                <select id="id_to_class" name="to_class" class="form-select w-full">
+                    <option value="">Select To Class</option>
+                    {% for cls in form.fields.to_class.queryset %}
+                    <option value="{{ cls.id }}" {% if cls.id == form.initial.to_class %}selected{% endif %}>
+                        {{ cls.name }}
+                    </option>
+                    {% endfor %}
+                </select>
             {% else %}
                 {{ field.as_field_group }}
             {% endif %}
-        {% else %}
-            {{ field.as_field_group }}
-        {% endif %}
         </div>
         {% endfor %}
         {% if form.errors %}
@@ -110,55 +72,6 @@
         <div class="pt-3">
             <button type="submit" class="ml-auto btn primary">Submit</button>
         </div>
-        {% if model_name == "Relationship" %}
-        <script>
-            function relationshipForm(allClasses) {
-                return {
-                    allClasses: allClasses,
-                    selectedFromClass: {% if form.from_class.value %}"{{ form.from_class.value }}"{% else %}""{% endif %},
-                    selectedToClass: {% if form.to_class.value %}"{{ form.to_class.value }}"{% else %}""{% endif %},
-                    fromClassOptions: [],
-                    toClassOptions: [],
-        
-                    init() {
-                        // Initialize with all classes if no selection
-                        this.fromClassOptions = this.allClasses
-                        this.toClassOptions = this.allClasses
-                        
-                        // If we have initial values (edit mode), update the filtered lists
-                        if (this.selectedFromClass) this.updateToClasses()
-                        if (this.selectedToClass) this.updateFromClasses()
-                    },
-        
-                    updateToClasses() {
-                        if (this.selectedFromClass) {
-                            const selectedClass = this.allClasses.find(cls => cls.id == this.selectedFromClass)
-                            if (selectedClass) {
-                                this.toClassOptions = this.allClasses.filter(cls => 
-                                    cls.module === selectedClass.module
-                                )
-                            }
-                        } else {
-                            this.toClassOptions = this.allClasses
-                        }
-                    },
-        
-                    updateFromClasses() {
-                        if (this.selectedToClass) {
-                            const selectedClass = this.allClasses.find(cls => cls.id == this.selectedToClass)
-                            if (selectedClass) {
-                                this.fromClassOptions = this.allClasses.filter(cls => 
-                                    cls.module === selectedClass.module
-                                )
-                            }
-                        } else {
-                            this.fromClassOptions = this.allClasses
-                        }
-                    }
-                }
-            }
-        </script>
-        {% endif %}
     </form>
 </section>
 <script src="{% static 'js/form.js' %}"></script>

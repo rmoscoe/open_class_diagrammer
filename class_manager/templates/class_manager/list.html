@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% load static %}
+{% load static has is_instance %}
 
 {% block page %}
 <section class="grow basis-full mx-4 mt-5 sm:mt-6 md:mx-5 md:mt-8 lg:mx-6 lg:mt-10 2xl:mx-8 2xl:mt-12" x-cloak>
@@ -17,32 +17,32 @@
         <table class="w-full">
             <thead>
                 <tr>
-                    {% if model_name != "Relationship" %}
+                    {% if view.model|has:"name" %}
                     <th class="text-left">NAME</th>
                     {% endif %}
-                    {% if model_name == "Project" or model_name == "Module" %}
+                    {% if view.model|has:"description" %}
                     <th class="text-left">DESCRIPTION</th>
                     {% endif %}
-                    {% if model_name == "Property" or model_name == "Method" %}
+                    {% if view.model|has:"class_assoc" %}
                     <th class="text-center">CLASS</th>
                     {% endif %}
-                    {% if model_name == "Class" or model_name == "Relationship" %}
+                    {% if view.model|is_instance:"Class|Relationship" %}
                     <th class="text-center">MODULE</th>
                     {% endif %}
-                    {% if model_name == "Module" or model_name == "Class" %}
+                    {% if view.model|is_instance:"Module|Class" %}
                     <th class="text-left">PROJECTS</th>
                     {% endif %}
-                    {% if model_name == "Property" or model_name == "Method" %}
+                    {% if view.model|has:"visibility" %}
                     <th class="text-center">VISIBILITY</th>
                     {% endif %}
-                    {% if model_name == "Property" %}
+                    {% if view.model|has:"data_type" %}
                     <th class="text-center">DATA TYPE</th>
                     {% endif %}
-                    {% if model_name == "Method" %}
+                    {% if view.model|is_instance:"Method" %}
                     <th class="text-left">ARGUMENTS</th>
                     <th class="text-center">RETURN TYPE</th>
                     {% endif %}
-                    {% if model_name == "Relationship" %}
+                    {% if view.model|is_instance:"Relationship" %}
                     <th class="text-center">FROM</th>
                     <th class="text-center">TO</th>
                     <th class="text-center">TYPE</th>
@@ -53,26 +53,26 @@
             <tbody>
                 {% for obj in object_list %}
                 <tr>
-                    {% if model_name != "Relationship" %}
+                    {% if obj|has:"name" %}
                     <td class="text-left">{{ obj.name }}</td>
                     {% endif %}
-                    {% if model_name == "Project" or model_name == "Module" %}
+                    {% if obj|has:"description" %}
                     <td class="text-left">{{ obj.description }}</td>
                     {% endif %}
-                    {% if model_name == "Property" or model_name == "Method" %}
+                    {% if obj|has:"class_assoc" %}
                     <td class="text-center">{{ obj.class_assoc.name }}</td>
                     {% endif %}
-                    {% if model_name == "Class" or model_name == "Relationship" %}
-                    <td class="text-center">{% if model_name == "Class" %}{{ obj.module.name }}{% elif model_name == "Relationship" %}{{ obj.from_class.module.name }}{% endif %}</td>
+                    {% if obj|is_instance:"Class|Relationship" %}
+                    <td class="text-center">{% if obj|has:"module" %}{{ obj.module.name }}{% elif obj|is_instance:"Relationship" %}{{ obj.from_class.module.name }}{% endif %}</td>
                     {% endif %}
-                    {% if model_name == "Module" or model_name == "Class" %}
+                    {% if obj|is_instance:"Module|Class" %}
                     <td class="text-left">
                         <ul class="list-disc list-outside ml-4">
-                            {% if model_name == "Module" %}
+                            {% if obj|has:"projects" %}
                                 {% for project in obj.projects.all %}
                                 <li>{{ project.name }}</li>
                                 {% endfor %}
-                            {% elif model_name == "Class" %}
+                            {% elif obj|has:"module" %}
                                 {% for project in obj.module.projects.all %}
                                 <li>{{ project.name }}</li>
                                 {% endfor %}
@@ -80,17 +80,17 @@
                         </ul>
                     </td>
                     {% endif %}
-                    {% if model_name == "Property" or model_name == "Method" %}
+                    {% if obj|has:"visibility" %}
                     <td class="text-center">{{ obj.visibility }}</td>
                     {% endif %}
-                    {% if model_name == "Property" %}
+                    {% if obj|has:"data_type" %}
                     <td class="text-center">{{ obj.data_type }}</td>
                     {% endif %}
-                    {% if model_name == "Method" %}
+                    {% if obj|is_instance:"Method" %}
                     <td class="text-left">{{ obj.arguments }}</td>
                     <td class="text-center">{{ obj.return_type }}</td>
                     {% endif %}
-                    {% if model_name == "Relationship" %}
+                    {% if obj|is_instance:"Relationship" %}
                     <td class="text-center">{{ obj.from_class.name }}</td>
                     <td class="text-center">{{ obj.to_class.name }}</td>
                     <td class="text-center">{{ obj.relationship_type }}</td>

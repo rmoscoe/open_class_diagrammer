@@ -3,15 +3,14 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponseRedirect, HttpResponse, Http404
-from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy, reverse, resolve
+from django.http import HttpResponseRedirect, Http404, JsonResponse
+from django.urls import reverse_lazy, reverse
+from django.views import View
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeletionMixin
-from .forms import RegistrationForm, UpdateUserForm, ProjectForm, ModuleForm, ClassForm, PropertyForm, MethodForm, RelationshipForm # , UserForm
+from .forms import RegistrationForm, UpdateUserForm, ProjectForm, ModuleForm, ClassForm, PropertyForm, MethodForm, RelationshipForm
 from .helpers import build_color_theme
-import json
 from .models import *
 from uuid import UUID
 
@@ -210,9 +209,6 @@ class AnonymousUserMixin(UserPassesTestMixin):
 
 class OCDListMixin:
     template_name = "class_manager/list.html"
-
-    # def get_queryset(self):
-    #     return Project.objects.filter(user=self.request.user.id)
     
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -625,9 +621,9 @@ class RelationshipCreateView(LoginRequiredMixin, OCDEditMixin, CreateView):
 
     def get_success_url(self):
         if self.request.POST.get("page", "relationship-detail") == "class-detail":
-            return reverse("class-detail", kwargs={"pk": self.object. from_class.id})
+            return reverse("class_manager:class-detail", kwargs={"pk": self.object. from_class.id})
         else:
-            return reverse("relationship-detail", kwargs={"pk", self.object.id})
+            return reverse("class_manager:relationship-detail", kwargs={"pk": self.object.id})
 
 class RelationshipUpdateView(LoginRequiredMixin, OCDEditMixin, UpdateView):
     model = Relationship
@@ -641,9 +637,9 @@ class RelationshipUpdateView(LoginRequiredMixin, OCDEditMixin, UpdateView):
 
     def get_success_url(self):
         if self.request.POST.get("page", "relationship-detail") == "class-detail":
-            return reverse("class-detail", kwargs={"pk": self.object. from_class.id})
+            return reverse("class_manager:class-detail", kwargs={"pk": self.object.from_class.id})
         else:
-            return reverse("relationship-detail", kwargs={"pk", self.object.id})
+            return reverse("class_manager:relationship-detail", kwargs={"pk": self.object.id})
         
 
 #================================#
@@ -673,3 +669,17 @@ class DiagramView(LoginRequiredMixin, TemplateView):
                 counter += 1
         context["colors"] = colors
         return context
+    
+
+#===============================#
+#          API VIEW(S)          #
+#===============================#
+
+class FilteredClasses(View):
+    def get(self, request, *args, **kwargs):
+        class_id = request.GET.get("class_id")
+        if not class_id or class_id == "undefined":
+            return JsonResponse({"error": "Missing class_id"}, status=400)
+        module = Class.objects.get(pk=class_id).module
+        classes = Class.objects.filter(module=module).values("id", "name")
+        return JsonResponse(list(classes), safe=False)

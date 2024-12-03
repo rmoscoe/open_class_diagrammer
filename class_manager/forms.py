@@ -80,7 +80,21 @@ class ProjectForm(ModelForm):
         if request is not None and request.resolver_match.url_name == "project-update":
             instance = kwargs.get("instance")
             for field in self.fields.keys():
-                self.fields[field].initial = instance[field]
+                if field.lower() == "modules":
+                    self.fields[field].initial = getattr(instance, "module_set", None).values_list("id", flat=True)
+                else:
+                    self.fields[field].initial = getattr(instance, field, None)
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+        if "modules" in self.cleaned_data:
+            selected_modules = self.cleaned_data["modules"]
+            instance.module_set.clear()
+            for module in selected_modules:
+                ProjectModule.objects.create(project=instance, module=module)
+        return instance
 
     class Meta:
         model = Project
@@ -101,7 +115,7 @@ class ModuleForm(ModelForm):
         if request is not None and request.resolver_match.url_name == "module-update":
             instance = kwargs.get("instance")
             for field in self.fields.keys():
-                self.fields[field].initial = instance[field]
+                self.fields[field].initial = getattr(instance, field, None)
 
     class Meta:
         model = Module
@@ -124,7 +138,7 @@ class ClassForm(ModelForm):
         if request and request.resolver_match.url_name == "class-update":
             instance = kwargs.get("instance")
             for field in self.fields.keys():
-                self.fields[field].initial = instance[field] 
+                self.fields[field].initial = getattr(instance, field, None) 
 
 class PropertyForm(ModelForm):
     class_assoc = ModelChoiceField(queryset=Class.objects.none(), widget=forms.Select, label="Class")
@@ -190,37 +204,26 @@ class RelationshipForm(ModelForm):
         else:
             print("User not given!")
             class_queryset = Class.objects.all()
+        to_class_queryset = class_queryset
+        from_class_queryset = class_queryset
+        if getattr(instance, "from_class", None):
+            f_class = instance.from_class
+            f_module = f_class.module
+            to_class_queryset = Class.objects.filter(module=f_module) | Class.objects.filter(pk=f_class.id)
+        self.fields["to_class"].queryset = to_class_queryset
+        if getattr(instance, "to_class", None):
+            t_class = instance.to_class
+            t_module = t_class.module
+            from_class_queryset = Class.objects.filter(module=t_module) | Class.objects.filter(pk=t_class.id)
+        self.fields["from_class"].queryset = from_class_queryset
         if request and request.resolver_match.url_name == "relationship-update" and instance:
             for field in self.fields.keys():
-                self.fields[field].initial = getattr(instance, field)
-        to_class_queryset = None
-        if self.fields["from_class"].initial:
-            f_class = None
-            if self.user is not None:
-                f_class = Class.objects.filter(user=self.user, name=self.fields["from_class"].initial).first()
-            else:
-                f_class = Class.objects.filter(name=self.fields["from_class"].initial).first()
-            f_module = f_class.module
-            to_class_queryset = Class.objects.filter(module=f_module)
-        elif self.user is not None:
-            to_class_queryset = Class.objects.filter(user=self.user)
-        else:
-            to_class_queryset = Class.objects.all()
-        self.fields["to_class"].queryset = to_class_queryset
-        from_class_queryset = None
-        if self.fields["to_class"].initial:
-            t_class = None
-            if self.user is not None:
-                t_class = Class.objects.filter(user=self.user, name=self.fields["to_class"].initial).first()
-            else:
-                t_class = Class.objects.filter(name=self.fields["to_class"].initial).first()
-            t_module = t_class.module
-            from_class_queryset = Class.objects.filter(module=t_module)
-        elif self.user is not None:
-            from_class_queryset = Class.objects.filter(user=self.user)
-        else:
-            from_class_queryset = Class.objects.all()
-        self.fields["from_class"].queryset = from_class_queryset
+                self.fields[field].initial = getattr(instance, field, None)
+        print(f"From Class Queryset: {self.fields['from_class'].queryset}")
+        print(f"From Class Initial: {self.fields['from_class'].initial}")
+        print(f"To Class Queryset: {self.fields['to_class'].queryset}")
+        print(f"To Class Initial: {self.fields['to_class'].initial}")
+
     
     class Meta:
         model = Relationship

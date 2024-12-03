@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load static %}
+{% load static is_instance has %}
 
 {% block page %}
 <section class="grow basis-full mx-4 mt-5 sm:mt-6 md:mx-5 md:mt-8 lg:mx-6 lg:mt-10 2xl:mx-8 2xl:mt-12" x-data="{ showDelete: false }" x-cloak>
@@ -42,17 +42,19 @@
     <section class="mt-4 sm:mt-6 md:mt-8 lg:mt-12 xl:mt-16 2xl:mt-20 3xl:mt-24 w-full flex justify-center">
         <table class="w-full md:w-5/6 lg:w-4/5 xl:w-3/4 2xl:w-1/2 3xl:w-1/3">
             <tbody>
+                {% if object|has:"name" %}
                 <tr class="text-lg">
                     <th class="font-bold">Name</th>
                     <td class="font-semibold">{{ object.name }}</td>
                 </tr>
-                {% if model_name == "Project" or model_name == "Module" %}
+                {% endif %}
+                {% if object|has:"description" %}
                 <tr>
                     <th>Description</th>
                     <td>{{ object.description }}</td>
                 </tr>
                 {% endif %}
-                {% if model_name == "Relationship" %}
+                {% if object|is_instance:"Relationship" %}
                 <tr>
                     <th>From</th>
                     <td>
@@ -70,7 +72,7 @@
                     <td>{{ object.relationship_type }}</td>
                 </tr>
                 {% endif %}
-                {% if model_name == "Property" or model_name == "Method" %}
+                {% if object|has:"class_assoc" %}
                 <tr>
                     <th>Class</th>
                     <td>
@@ -111,13 +113,13 @@
                     </td>
                 </tr>
                 {% endif %}
-                {% if model_name == "Property" %}
+                {% if object|has:"data_type" %}
                 <tr>
                     <th>Data Type</th>
                     <td>{{ object.data_type }}</td>
                 </tr>
                 {% endif %}
-                {% if model_name == "Method" %}
+                {% if object|is_instance:"Method" %}
                 <tr x-data="{ showTooltip: false }">
                     <th>Arguments</th>
                     <td class="relative" @mouseenter="showTooltip = true; $nextTick(() => {const tooltip = $el.querySelector('.tooltip'); const tooltipRect = tooltip.getBoundingClientRect(); const viewportWidth = document.documentElement.clientWidth; if (tooltipRect.right >= viewportWidth) {const overflow = tooltipRect.right - viewportWidth; tooltip.style.left = `calc(75% - ${overflow}px - 1rem)`;}; const h = tooltip.offsetHeight; tooltip.style.top = `-${h + 4}px`})" @mouseleave="showTooltip = false; const tooltip = $el.querySelector('.tooltip'); tooltip.style.left = ''">
@@ -132,7 +134,7 @@
                     <td>{{ object.return_type }}</td>
                 </tr>
                 {% endif %}
-                {% if object.module %}
+                {% if object|has:"module" %}
                 <tr>
                     <th>Module</th>
                     <td>
@@ -156,7 +158,7 @@
                     </td>
                 </tr>
                 {% endif %}
-                {% if object.projects %}
+                {% if object|is_instance:"Module" %}
                 <tr>
                     <th>Projects</th>
                     <td>
