@@ -30,7 +30,6 @@ class RegistrationForm(UserCreationForm):
 
     def is_valid(self):
         valid = super().is_valid()
-        print(f"Valid: {valid}")
         if not valid:
             errors = self._errors.setdefault(forms.forms.NON_FIELD_ERRORS, forms.utils.ErrorList())
             for field, field_errors in self.errors.items():
@@ -219,12 +218,7 @@ class RelationshipForm(ModelForm):
         if request and request.resolver_match.url_name == "relationship-update" and instance:
             for field in self.fields.keys():
                 self.fields[field].initial = getattr(instance, field, None)
-        print(f"From Class Queryset: {self.fields['from_class'].queryset}")
-        print(f"From Class Initial: {self.fields['from_class'].initial}")
-        print(f"To Class Queryset: {self.fields['to_class'].queryset}")
-        print(f"To Class Initial: {self.fields['to_class'].initial}")
 
-    
     class Meta:
         model = Relationship
         fields = ["from_class", "to_class", "relationship_type"]

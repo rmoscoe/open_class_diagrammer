@@ -3,7 +3,7 @@
 <aside class="p-2 sm:p-4 md:p-2 xl:py-4 xl:px-8 -translate-x-full transition-transform duration-300 overflow-visible z-30" :class="showSidebar ? 'relative top-0 bottom-0 left-0 border-r border-slate-300 dark:border-slate-400 translate-x-0' : 'absolute'">
     <nav class="px-1 md:px-2 w-10 flex justify-center flex-wrap space-y-2 sm:space-y-4 md:space-y-6 transition-[width] duration-300 overflow-visible z-30" :class="sidebarExpanded && 'md:w-48 lg:w-56'">
         <div class="flex items-center justify-center w-full overflow-visible">
-            <button @click="sidebarExpanded = !sidebarExpanded" class="relative w-full p-1 text-violet-700 dark:text-violet-600 flex justify-end items-baseline hover:bg-violet-200 dark:hover:bg-violet-400 active:bg-violet-300 dark:active:bg-violet-400 after:content-['Expand'] with-tooltip" :class="sidebarExpanded && 'after:hidden'">
+            <button @click="sidebarExpanded = !sidebarExpanded; let sidebarState = { showSidebar: true, sidebarExpanded: sidebarExpanded }; localStorage.setItem('sidebarState', JSON.stringify(sidebarState))" class="relative w-full p-1 text-violet-700 dark:text-violet-600 flex justify-end items-baseline hover:bg-violet-200 dark:hover:bg-violet-400 active:bg-violet-300 dark:active:bg-violet-400 after:content-['Expand'] with-tooltip" :class="sidebarExpanded && 'after:hidden'">
                 |
                 <i class="fa-solid fa-angles-right transition-transform duration-300 h-4 w-4" :class="sidebarExpanded && 'rotate-180'"></i>
             </button>

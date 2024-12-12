@@ -151,6 +151,9 @@ class BaseAttribute(Model):
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     last_modified_at = models.DateTimeField(auto_now=True, blank=True)
 
+    class Meta:
+        abstract = True
+
 class Property(BaseAttribute):
     data_type = models.CharField(max_length=255, null=True, blank=True, help_text="The data type (e.g., string, integer, Boolean, list, dictionary) of the property.")
 

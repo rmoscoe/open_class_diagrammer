@@ -257,7 +257,6 @@ class OCDEditMixin:
     def get_success_url(self, *args, **kwargs):
         model_name = self.model._meta.verbose_name
         url_pattern = f"class_manager:{model_name}-detail"
-        print(f"PK: {self.object.pk}")
         return reverse_lazy(url_pattern, kwargs={"pk": int(self.object.pk)})
 
 class OCDDeleteMixin(DeletionMixin):

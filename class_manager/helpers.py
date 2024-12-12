@@ -24,7 +24,6 @@ def build_color_theme(hex_string):
     base_color = spectra.html(hex_string)
     white = spectra.html("#ffffff")
     black = spectra.html("#000000")
-    print(base_color.to("hsl").values)
     content_color = base_color.blend(white, 0.65) if base_color.to("hsl").values[2] < .70 else base_color.blend(white, 0.3)
     content_color = content_color.darken(10) if content_color.to("hsl").values[2] > .95 else content_color
     theme["content_color"] = content_color.hexcode

@@ -2,7 +2,7 @@
 
 <header class="flex items-center w-full">
     <div class="flex h-10 sm:h-12 md:h-14 w-14 px-1 md:px-2 ml-px items-center border-r border-slate-300 dark:border-slate-400 transition-[width] duration-300" :class="showSidebar && sidebarExpanded ? 'md:w-52 lg:w-60' : !showSidebar && 'border-b'">
-        <button class="flex justify-center items-center my-auto" @click="showSidebar = !showSidebar">
+        <button class="flex justify-center items-center my-auto" @click="showSidebar = !showSidebar; let sidebarStateStr = localStorage.getItem('sidebarState'); let sidebarState = { showSidebar: showSidebar, sidebarExpanded: false }; if (sidebarStateStr) {sidebarState = JSON.parse(sidebarStateStr)}; sidebarState.showSidebar = showSidebar; sidebarStateStr = JSON.stringify(sidebarState); localStorage.setItem('sidebarState', sidebarStateStr)">
             <i class="fa-solid fa-bars transition-transform duration-300 h-4 w-8 mx-auto my-auto" :class="showSidebar && 'rotate-90'"></i>
         </button>
     </div>

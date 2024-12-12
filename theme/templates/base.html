@@ -25,8 +25,17 @@
             } else {
                 document.documentElement.classList.remove('dark');
             }
-			if (window.innerWidth >= 768) {
-				sidebarState = 'open';
+			let sidebarStateStr = localStorage.getItem('sidebarState');
+			let sidebarState = null;
+			if (sidebarStateStr) {
+				sidebarState = JSON.parse(sidebarStateStr);
+			} 
+			console.log(sidebarState);
+			if (sidebarState) {
+				showSidebar = sidebarState.showSidebar;
+				sidebarExpanded = sidebarState.sidebarExpanded;
+			} else if (window.innerWidth >= 768) {
+				showSidebar = 'open';
 			}
 		}"
 	>

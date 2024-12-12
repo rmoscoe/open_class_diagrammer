@@ -23,7 +23,7 @@
                     {% if view.model|has:"description" %}
                     <th class="text-left">DESCRIPTION</th>
                     {% endif %}
-                    {% if view.model|has:"class_assoc" %}
+                    {% if view.model|has:"class_assoc_id" %}
                     <th class="text-center">CLASS</th>
                     {% endif %}
                     {% if view.model|is_instance:"Class|Relationship" %}
@@ -59,7 +59,7 @@
                     {% if obj|has:"description" %}
                     <td class="text-left">{{ obj.description }}</td>
                     {% endif %}
-                    {% if obj|has:"class_assoc" %}
+                    {% if obj|has:"class_assoc_id" %}
                     <td class="text-center">{{ obj.class_assoc.name }}</td>
                     {% endif %}
                     {% if obj|is_instance:"Class|Relationship" %}
