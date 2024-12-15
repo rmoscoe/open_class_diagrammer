@@ -404,7 +404,11 @@ class ProjectListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView
     model = Project
 
     def get_queryset(self):
-        return Project.objects.filter(user=self.request.user.id)
+        sort = self.request.GET.get("sort", None)
+        qs = Project.objects.filter(user=self.request.user.id)
+        if sort:
+            qs = qs.order_by(sort)
+        return qs
 
 class ProjectDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Project
@@ -438,7 +442,11 @@ class ModuleListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView)
     model = Module
 
     def get_queryset(self):
-        return Module.objects.prefetch_related("projects").filter(user=self.request.user.id)
+        sort = self.request.GET.get("sort", None)
+        qs = Module.objects.prefetch_related("projects").filter(user=self.request.user.id)
+        if sort:
+            qs = qs.order_by(sort)
+        return qs
 
 class ModuleDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Module
@@ -477,7 +485,11 @@ class ClassListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView):
     model = Class
 
     def get_queryset(self):
-        return Class.objects.select_related("module").prefetch_related("module__projects").filter(user=self.request.user.id)
+        sort = self.request.GET.get("sort", None)
+        qs = Class.objects.select_related("module").prefetch_related("module__projects").filter(user=self.request.user.id)
+        if sort:
+            qs = qs.order_by(sort)
+        return qs
     
 class ClassDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Class
@@ -525,7 +537,11 @@ class PropertyListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListVie
     model = Property
 
     def get_queryset(self):
-        return Property.objects.select_related("class_assoc").select_related("class_assoc__module").prefetch_related("class_assoc__module__projects").filter(user=self.request.user.id)
+        sort = self.request.GET.get("sort", None)
+        qs = Property.objects.select_related("class_assoc").select_related("class_assoc__module").prefetch_related("class_assoc__module__projects").filter(user=self.request.user.id)
+        if sort:
+            qs = qs.order_by(sort)
+        return qs
 
 class PropertyDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Property
@@ -562,7 +578,11 @@ class MethodListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView)
     model = Method
 
     def get_queryset(self):
-        return Method.objects.select_related("class_assoc").select_related("class_assoc__module").prefetch_related("class_assoc__module__projects").filter(user=self.request.user.id)
+        sort = self.request.GET.get("sort", None)
+        qs = Method.objects.select_related("class_assoc").select_related("class_assoc__module").prefetch_related("class_assoc__module__projects").filter(user=self.request.user.id)
+        if sort:
+            qs = qs.order_by(sort)
+        return qs
 
 class MethodDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Method
@@ -600,7 +620,11 @@ class RelationshipListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, Lis
     template_name = "class_manager/list.html"
 
     def get_queryset(self):
-        return Relationship.objects.select_related("from_class", "to_class").prefetch_related("from_class__module", "to_class__module").filter(from_class__user=self.request.user.id)
+        sort = self.request.GET.get("sort", None)
+        qs = Relationship.objects.select_related("from_class", "to_class").prefetch_related("from_class__module", "to_class__module").filter(from_class__user=self.request.user.id)
+        if sort:
+            qs = qs.order_by(sort)
+        return qs
 
 class RelationshipDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Relationship

@@ -13,87 +13,120 @@
         </a>
     </section> 
     {% if object_list %}
-    <section class="px-0.5 sm:px-1 md:px-2 lg:px-4 xl:px-6 2xl:px-8 3xl:px-10" x-data="{ showDelete: false, deletePK: '' }">
-        <table class="w-full">
+    <section class="px-0.5 sm:px-1 md:px-2 lg:px-4 xl:px-6 2xl:px-8 3xl:px-10" x-data="{ showDelete: false, deletePK: '', filter: '' }">
+        <div class="flex w-full mt-2 justify-end items-center">
+            <div class="flex relative my-2 sm:my-4 md:my-6 lg:mt-10 lg:mb-8 w-full sm:w-4/5 md:w-1/2 lg:w-80">
+                <input class="pl-9" x-model="filter" placeholder="Search" />
+                <div class="absolute pointer-events none flex h-full w-10 items-center justify-center">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+            </div>
+        </div>
+        <table class="w-full" x-data="{ sort: null }" x-init="const searchParams = document.location.search; sort = searchParams.get('sort')">
             <thead>
                 <tr>
                     {% if view.model|has:"name" %}
-                    <th class="text-left">NAME</th>
+                    <th class="text-left space-x-1">
+                        <a :href="sort === 'name' ? `${window.location.pathname}?sort=-name` : `${window.location.pathname}?sort=name`">
+                            <span :class="sort === 'name' || sort === '-name' && 'underline'">NAME</span>
+                            <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'name'"></i>
+                            <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-name'"></i>
+                        </a>
+                    </th>
                     {% endif %}
                     {% if view.model|has:"description" %}
-                    <th class="text-left">DESCRIPTION</th>
+                    <th class="text-left space-x-1">
+                        <a :href="sort === 'description' ? `{window.location.pathname}?sort=-description` : `${window.location.pathname}?sort=description">
+                            <span :class="sort === 'description' || sort === '-description' && 'underline'">DESCRIPTION</span>
+                            <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'description'"></i>
+                            <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-description'"></i>
+                        </a>
+                    </th>
                     {% endif %}
                     {% if view.model|has:"class_assoc_id" %}
-                    <th class="text-center">CLASS</th>
+                    <th class="text-center space-x-1">
+                        <a :href="sort === 'class_assoc__name' ? `${window.location.pathname}?sort=-class_assoc__name` : `${window.location.pathname}?sort=class_assoc__name`">
+                            <span :class="sort === 'class_assoc__name' || sort === '-class_assoc__name' && 'underline'">CLASS</span>
+                            <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'class_assoc__name'"></i>
+                            <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-class_assoc__name'"></i>
+                        </a>
+                    </th>
                     {% endif %}
                     {% if view.model|is_instance:"Class|Relationship" %}
-                    <th class="text-center">MODULE</th>
+                    <th class="text-center space-x-1">
+                        <a :href="sort === 'module__name' ? `${window.location.pathname}?sort=-module__name : sort === 'from_class__module__name' ? `${window.location.pathname}?sort=-from_class__module__name` : `${window.location.pathname}?sort=from_class__module__name">
+                            <span :class="sort === 'module__name' || sort === '-module__name' || sort === 'from_class__module__name' || sort === '-from_class__module__name' && 'underline'">MODULE</span>
+                            <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'module__name' || sort === 'from_class__module__name'"></i>
+                            <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-module__name' || sort === '-from_class__module__name'"></i>
+                        </a>
+                    </th>
                     {% endif %}
                     {% if view.model|is_instance:"Module|Class" %}
-                    <th class="text-left">PROJECTS</th>
+                    <th class="text-left space-x-1">
+                        <a :href="" PROJECTS</th>
                     {% endif %}
                     {% if view.model|has:"visibility" %}
-                    <th class="text-center">VISIBILITY</th>
+                    <th class="text-center space-x-1">VISIBILITY</th>
                     {% endif %}
                     {% if view.model|has:"data_type" %}
-                    <th class="text-center">DATA TYPE</th>
+                    <th class="text-center space-x-1">DATA TYPE</th>
                     {% endif %}
                     {% if view.model|is_instance:"Method" %}
-                    <th class="text-left">ARGUMENTS</th>
-                    <th class="text-center">RETURN TYPE</th>
+                    <th class="text-left space-x-1">ARGUMENTS</th>
+                    <th class="text-center space-x-1">RETURN TYPE</th>
                     {% endif %}
                     {% if view.model|is_instance:"Relationship" %}
-                    <th class="text-center">FROM</th>
-                    <th class="text-center">TO</th>
-                    <th class="text-center">TYPE</th>
+                    <th class="text-center space-x-1">FROM</th>
+                    <th class="text-center space-x-1">TO</th>
+                    <th class="text-center space-x-1">TYPE</th>
                     {% endif %}
-                    <th class="text-left">ACTIONS</th>
+                    <th class="text-left space-x-1">ACTIONS</th>
                 </tr>
             </thead>
             <tbody>
                 {% for obj in object_list %}
-                <tr>
+                <tr x-data="{ filterMatch: true }" x-show="filterMatch" x-init="$watch('filter', val => {filterMatch = false;})">
                     {% if obj|has:"name" %}
-                    <td class="text-left">{{ obj.name }}</td>
+                    <td class="text-left" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.name }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.name }}</td>
                     {% endif %}
                     {% if obj|has:"description" %}
-                    <td class="text-left">{{ obj.description }}</td>
+                    <td class="text-left" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.description }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.description }}</td>
                     {% endif %}
                     {% if obj|has:"class_assoc_id" %}
-                    <td class="text-center">{{ obj.class_assoc.name }}</td>
+                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.class_assoc.name }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.class_assoc.name }}</td>
                     {% endif %}
                     {% if obj|is_instance:"Class|Relationship" %}
-                    <td class="text-center">{% if obj|has:"module" %}{{ obj.module.name }}{% elif obj|is_instance:"Relationship" %}{{ obj.from_class.module.name }}{% endif %}</td>
+                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{% if obj|has:'module'%}{{ obj.module.name }}{% elif obj|is_instance:'Relationship' %}{{ obj.from_class.module.name }}{% endif %}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{% if obj|has:"module" %}{{ obj.module.name }}{% elif obj|is_instance:"Relationship" %}{{ obj.from_class.module.name }}{% endif %}</td>
                     {% endif %}
                     {% if obj|is_instance:"Module|Class" %}
                     <td class="text-left">
                         <ul class="list-disc list-outside ml-4">
                             {% if obj|has:"projects" %}
                                 {% for project in obj.projects.all %}
-                                <li>{{ project.name }}</li>
+                                <li x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ project.name }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ project.name }}</li>
                                 {% endfor %}
                             {% elif obj|has:"module" %}
                                 {% for project in obj.module.projects.all %}
-                                <li>{{ project.name }}</li>
+                                <li x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ project.name }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ project.name }}</li>
                                 {% endfor %}
                             {% endif %}
                         </ul>
                     </td>
                     {% endif %}
                     {% if obj|has:"visibility" %}
-                    <td class="text-center">{{ obj.visibility }}</td>
+                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.visibility }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.visibility }}</td>
                     {% endif %}
                     {% if obj|has:"data_type" %}
-                    <td class="text-center">{{ obj.data_type }}</td>
+                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.data_type }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.data_type }}</td>
                     {% endif %}
                     {% if obj|is_instance:"Method" %}
-                    <td class="text-left">{{ obj.arguments }}</td>
-                    <td class="text-center">{{ obj.return_type }}</td>
+                    <td class="text-left" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.arguments }}'.trim().toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.arguments }}</td>
+                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.return_type }}'.trim().toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.return_type }}</td>
                     {% endif %}
                     {% if obj|is_instance:"Relationship" %}
-                    <td class="text-center">{{ obj.from_class.name }}</td>
-                    <td class="text-center">{{ obj.to_class.name }}</td>
-                    <td class="text-center">{{ obj.relationship_type }}</td>
+                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.from_class.name }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.from_class.name }}</td>
+                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.to_class.name }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.to_class.name }}</td>
+                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.relationship_type }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.relationship_type }}</td>
                     {% endif %}
                     <td>
                         <div class="w-full flex justify-start items-center space-x-2 md:space-x-3 xl:space-x-4">
