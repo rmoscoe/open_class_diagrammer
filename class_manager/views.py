@@ -11,6 +11,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeletionMixin
 from .forms import RegistrationForm, UpdateUserForm, ProjectForm, ModuleForm, ClassForm, PropertyForm, MethodForm, RelationshipForm
 from .helpers import build_color_theme
+import json
 from .models import *
 from uuid import UUID
 
@@ -216,6 +217,8 @@ class OCDListMixin:
         context["detail_route"] = "class_manager:" + self.model.__name__.lower() + "-detail"
         context["model_name"] = self.model._meta.verbose_name.title()
         context["model_name_plural"] = self.model._meta.verbose_name_plural.title()
+        object_list_json = json.dumps(list(context["object_list"]), cls=CustomJSONEncoder) if context["object_list"] is not None else json.dumps([])
+        context['object_list_json'] = object_list_json
         return context
 
 class OCDDetailMixin:
@@ -404,11 +407,7 @@ class ProjectListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView
     model = Project
 
     def get_queryset(self):
-        sort = self.request.GET.get("sort", None)
-        qs = Project.objects.filter(user=self.request.user.id)
-        if sort:
-            qs = qs.order_by(sort)
-        return qs
+        return Project.objects.filter(user=self.request.user.id).values('id', 'name', 'description')
 
 class ProjectDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Project
@@ -442,11 +441,22 @@ class ModuleListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView)
     model = Module
 
     def get_queryset(self):
-        sort = self.request.GET.get("sort", None)
+        return Module.objects.prefetch_related("projects").filter(user=self.request.user.id).values("name", "description")
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         qs = Module.objects.prefetch_related("projects").filter(user=self.request.user.id)
-        if sort:
-            qs = qs.order_by(sort)
-        return qs
+        object_list = []
+        for module in qs:
+            module_data = {
+                "id": module.id,
+                "name": module.name,
+                "description": module.description,
+                "projects": [{"id": project.id, "name": project.name} for project in module.projects.all()]
+            }
+            object_list.append(module_data)
+        context["object_list_json"] = json.dumps(object_list)
+        return context
 
 class ModuleDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Module
@@ -485,11 +495,21 @@ class ClassListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView):
     model = Class
 
     def get_queryset(self):
-        sort = self.request.GET.get("sort", None)
+        return Class.objects.select_related("module").prefetch_related("module__projects").filter(user=self.request.user.id).values("id", "name", "module__name")
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         qs = Class.objects.select_related("module").prefetch_related("module__projects").filter(user=self.request.user.id)
-        if sort:
-            qs = qs.order_by(sort)
-        return qs
+        object_list = []
+        for cls in qs:
+            class_data = {
+                "id": cls.id,
+                "name": cls.name,
+                "module": {"name": cls.module.name, "projects": [{"id": project.id, "name": project.name} for project in cls.module.projects.all()]}                
+            }
+            object_list.append(class_data)
+        context["object_list_json"] = json.dumps(object_list, cls=CustomJSONEncoder)
+        return context
     
 class ClassDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Class
@@ -537,11 +557,23 @@ class PropertyListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListVie
     model = Property
 
     def get_queryset(self):
-        sort = self.request.GET.get("sort", None)
-        qs = Property.objects.select_related("class_assoc").select_related("class_assoc__module").prefetch_related("class_assoc__module__projects").filter(user=self.request.user.id)
-        if sort:
-            qs = qs.order_by(sort)
-        return qs
+        return Property.objects.select_related("class_assoc").filter(user=self.request.user.id).values('id', 'name', 'visibility', 'data_type', 'class_assoc__name', 'class_assoc__module__name', 'class_assoc__module__projects')
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        qs = Property.objects.select_related("class_assoc").filter(user=self.request.user.id)
+        object_list = []
+        for property in qs:
+            property_data = {
+                "id": property.id,
+                "name": property.name,
+                "class_assoc": {"id": property.class_assoc.id, "name": property.class_assoc.name},
+                "visibility": property.visibility,
+                "data_type": property.data_type,
+            }
+            object_list.append(property_data)
+        context["object_list_json"] = json.dumps(object_list, cls=CustomJSONEncoder)
+        return context
 
 class PropertyDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Property
@@ -578,11 +610,24 @@ class MethodListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, ListView)
     model = Method
 
     def get_queryset(self):
-        sort = self.request.GET.get("sort", None)
-        qs = Method.objects.select_related("class_assoc").select_related("class_assoc__module").prefetch_related("class_assoc__module__projects").filter(user=self.request.user.id)
-        if sort:
-            qs = qs.order_by(sort)
-        return qs
+        return Method.objects.select_related("class_assoc").filter(user=self.request.user.id).values("name", "visibility", "class_assoc__name", "arguments", "return_type")
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        qs = Method.objects.select_related("class_assoc").filter(user=self.request.user.id)
+        object_list = []
+        for method in qs:
+            method_data = {
+                "id": method.id,
+                "name": method.name,
+                "class_assoc": {"id": method.class_assoc.id, "name": method.class_assoc.name},
+                "visibility": method.visibility,
+                "arguments": method.arguments,
+                "return_type": method.return_type
+            }
+            object_list.append(method_data)
+        context["object_list_json"] = json.dumps(object_list, cls=CustomJSONEncoder)
+        return context
 
 class MethodDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Method
@@ -620,11 +665,22 @@ class RelationshipListView(LoginRequiredMixin, OCDListMixin, OCDDeleteMixin, Lis
     template_name = "class_manager/list.html"
 
     def get_queryset(self):
-        sort = self.request.GET.get("sort", None)
+        return Relationship.objects.select_related("from_class", "to_class").prefetch_related("from_class__module", "to_class__module").filter(from_class__user=self.request.user.id).values("from_class__name", "from_class__module__name", "to_class__name", "to_class__module__name", "relationship_type")
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         qs = Relationship.objects.select_related("from_class", "to_class").prefetch_related("from_class__module", "to_class__module").filter(from_class__user=self.request.user.id)
-        if sort:
-            qs = qs.order_by(sort)
-        return qs
+        object_list = []
+        for relationship in qs:
+            relationship_data = {
+                "id": relationship.id,
+                "from_class": {"id": relationship.from_class.id, "name": relationship.from_class.name, "module": {"name": relationship.from_class.module.name}},
+                "to_class": {"id": relationship.to_class.id, "name": relationship.to_class.name, "module": {"name": relationship.to_class.module.name}},
+                "relationship_type": relationship.relationship_type
+            }
+            object_list.append(relationship_data)
+        context["object_list_json"] = json.dumps(object_list, cls=CustomJSONEncoder)
+        return context
 
 class RelationshipDetailView(LoginRequiredMixin, OCDDetailMixin, OCDDeleteMixin, DetailView):
     model = Relationship
@@ -692,17 +748,3 @@ class DiagramView(LoginRequiredMixin, TemplateView):
                 counter += 1
         context["colors"] = colors
         return context
-    
-
-#===============================#
-#          API VIEW(S)          #
-#===============================#
-
-class FilteredClasses(View):
-    def get(self, request, *args, **kwargs):
-        class_id = request.GET.get("class_id")
-        if not class_id or class_id == "undefined":
-            return JsonResponse({"error": "Missing class_id"}, status=400)
-        module = Class.objects.get(pk=class_id).module
-        classes = Class.objects.filter(module=module).values("id", "name")
-        return JsonResponse(list(classes), safe=False)

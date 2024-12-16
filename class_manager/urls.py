@@ -1,5 +1,5 @@
-from class_manager.views import ProjectListView, ProjectDetailView, ProjectCreateView, ProjectUpdateView, ModuleListView, ModuleDetailView, ModuleCreateView, ModuleUpdateView, ClassListView, ClassDetailView, ClassCreateView, ClassUpdateView, PropertyListView, PropertyDetailView, PropertyCreateView, PropertyUpdateView, MethodListView, MethodDetailView, MethodCreateView, MethodUpdateView, RelationshipListView, RelationshipDetailView, RelationshipCreateView, RelationshipUpdateView, DiagramView, FilteredClasses
-from django.urls import path, resolve
+from class_manager.views import ProjectListView, ProjectDetailView, ProjectCreateView, ProjectUpdateView, ModuleListView, ModuleDetailView, ModuleCreateView, ModuleUpdateView, ClassListView, ClassDetailView, ClassCreateView, ClassUpdateView, PropertyListView, PropertyDetailView, PropertyCreateView, PropertyUpdateView, MethodListView, MethodDetailView, MethodCreateView, MethodUpdateView, RelationshipListView, RelationshipDetailView, RelationshipCreateView, RelationshipUpdateView, DiagramView
+from django.urls import path
 
 models = ["project", "module", "class", "property", "method", "relationship"]
 actions = ["list", "detail", "create", "update"]
@@ -23,6 +23,5 @@ for i, p in enumerate(paths):
     urlpatterns.append(path(p, views[i].as_view(), name=names[i]))
 
 urlpatterns += [
-    path("project/<pk>/diagram/", DiagramView.as_view(), name="diagram"),
-    path("api/filtered-classes/", FilteredClasses.as_view(), name="filtered-classes")
+    path("project/<pk>/diagram/", DiagramView.as_view(), name="diagram")
 ]

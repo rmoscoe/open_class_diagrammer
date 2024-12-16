@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% load static has is_instance %}
+{% load static has is_instance sanitize %}
 
 {% block page %}
 <section class="grow basis-full mx-4 mt-5 sm:mt-6 md:mx-5 md:mt-8 lg:mx-6 lg:mt-10 2xl:mx-8 2xl:mt-12" x-cloak>
@@ -22,124 +22,241 @@
                 </div>
             </div>
         </div>
-        <table class="w-full" x-data="{ sort: null }" x-init="const searchParams = document.location.search; sort = searchParams.get('sort')">
+        <table class="w-full" x-data="{ sort: null, object_list: {{ object_list_json }} }">
             <thead>
                 <tr>
                     {% if view.model|has:"name" %}
-                    <th class="text-left space-x-1">
-                        <a :href="sort === 'name' ? `${window.location.pathname}?sort=-name` : `${window.location.pathname}?sort=name`">
-                            <span :class="sort === 'name' || sort === '-name' && 'underline'">NAME</span>
-                            <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'name'"></i>
-                            <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-name'"></i>
-                        </a>
+                    <th class="text-left space-x-1 hover:bg-white dark:hover:bg-slate-600 group" @click="sort = sort === 'name' ? '-name' : 'name'">
+                        <span class="group-hover:underline">NAME</span>
+                        <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'name'"></i>
+                        <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-name'"></i>
                     </th>
                     {% endif %}
                     {% if view.model|has:"description" %}
-                    <th class="text-left space-x-1">
-                        <a :href="sort === 'description' ? `{window.location.pathname}?sort=-description` : `${window.location.pathname}?sort=description">
-                            <span :class="sort === 'description' || sort === '-description' && 'underline'">DESCRIPTION</span>
-                            <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'description'"></i>
-                            <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-description'"></i>
-                        </a>
+                    <th class="text-left space-x-1 hover:bg-white dark:hover:bg-slate-600 group" @click="sort = sort === 'description' ? '-description' : 'description'">
+                        <span class="group-hover:underline">DESCRIPTION</span>
+                        <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'description'"></i>
+                        <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-description'"></i>
                     </th>
                     {% endif %}
                     {% if view.model|has:"class_assoc_id" %}
-                    <th class="text-center space-x-1">
-                        <a :href="sort === 'class_assoc__name' ? `${window.location.pathname}?sort=-class_assoc__name` : `${window.location.pathname}?sort=class_assoc__name`">
-                            <span :class="sort === 'class_assoc__name' || sort === '-class_assoc__name' && 'underline'">CLASS</span>
-                            <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'class_assoc__name'"></i>
-                            <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-class_assoc__name'"></i>
-                        </a>
+                    <th class="text-center space-x-1 hover:bg-white dark:hover:bg-slate-600 group" @click="sort = sort === 'class_assoc__name' ? '-class_assoc__name' : 'class_assoc__name'">
+                        <span class="group-hover:underline">CLASS</span>
+                        <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'class_assoc__name'"></i>
+                        <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-class_assoc__name'"></i>
                     </th>
                     {% endif %}
                     {% if view.model|is_instance:"Class|Relationship" %}
-                    <th class="text-center space-x-1">
-                        <a :href="sort === 'module__name' ? `${window.location.pathname}?sort=-module__name : sort === 'from_class__module__name' ? `${window.location.pathname}?sort=-from_class__module__name` : `${window.location.pathname}?sort=from_class__module__name">
-                            <span :class="sort === 'module__name' || sort === '-module__name' || sort === 'from_class__module__name' || sort === '-from_class__module__name' && 'underline'">MODULE</span>
-                            <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'module__name' || sort === 'from_class__module__name'"></i>
-                            <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-module__name' || sort === '-from_class__module__name'"></i>
-                        </a>
+                    <th class="text-center space-x-1 hover:bg-white dark:hover:bg-slate-600 group" @click="sort = sort === 'module__name' ? '-module__name' : sort === 'from_class__module__name' ? '-from_class__module__name' : '{{ view.model|is_instance:'Class' }}'.toLowerCase() === 'true' ? 'module__name' : 'from_class__module__name'">
+                        <span class="group-hover:underline">MODULE</span>
+                        <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'module__name' || sort === 'from_class__module__name'"></i>
+                        <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-module__name' || sort === '-from_class__module__name'"></i>
                     </th>
                     {% endif %}
                     {% if view.model|is_instance:"Module|Class" %}
-                    <th class="text-left space-x-1">
-                        <a :href="" PROJECTS</th>
+                    <th class="text-left space-x-1 hover:bg-white dark:hover:bg-slate-600 group" @click="sort = sort === 'projects' ? '-projects' : sort === 'module__projects' ? '-module__projects' : '{{ view.model|is_instance:'Module' }}'.toLowerCase() === 'true' ? 'projects' : 'module__projects'">
+                        <span class="group-hover:underline">PROJECTS</span>
+                        <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'projects' || sort === 'module__projects'"></i>
+                        <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-projects' || sort === '-module__projects'"></i>
+                    </th>
                     {% endif %}
                     {% if view.model|has:"visibility" %}
-                    <th class="text-center space-x-1">VISIBILITY</th>
+                    <th class="text-center space-x-1 hover:bg-white dark:hover:bg-slate-600 group" @click="sort = sort === 'visibility' ? '-visibility' : 'visibility'">
+                        <span class="group-hover:underline">VISIBILITY</span>
+                        <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'visibility'"></i>
+                        <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-visibility'"></i>
+                    </th>
                     {% endif %}
                     {% if view.model|has:"data_type" %}
-                    <th class="text-center space-x-1">DATA TYPE</th>
+                    <th class="text-center space-x-1 hover:bg-white dark:hover:bg-slate-600 group" @click="sort = sort === 'data_type' ? '-data_type' : 'data_type'">
+                        <span class="group-hover:underline">DATA TYPE</span>
+                        <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'data_type'"></i>
+                        <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-data_type'"></i>
+                    </th>
                     {% endif %}
                     {% if view.model|is_instance:"Method" %}
-                    <th class="text-left space-x-1">ARGUMENTS</th>
-                    <th class="text-center space-x-1">RETURN TYPE</th>
+                    <th class="text-left space-x-1 hover:bg-white dark:hover:bg-slate-600 group" @click="sort = sort === 'arguments' ? '-arguments' : 'arguments'">
+                        <span class="group-hover:underline">ARGUMENTS</span>
+                        <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'arguments'"></i>
+                        <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-arguments'"></i>
+                    </th>
+                    <th class="text-center space-x-1 hover:bg-white dark:hover:bg-slate-600 group" @click="sort = sort === 'return_type' ? '-return_type' : 'return_type'">
+                        <span class="group-hover:underline">RETURN TYPE</span>
+                        <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'return_type'"></i>
+                        <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-return_type'"></i>
+                    </th>
                     {% endif %}
                     {% if view.model|is_instance:"Relationship" %}
-                    <th class="text-center space-x-1">FROM</th>
-                    <th class="text-center space-x-1">TO</th>
-                    <th class="text-center space-x-1">TYPE</th>
+                    <th class="text-center space-x-1 hover:bg-white dark:hover:bg-slate-600 group" @click="sort = sort === 'from_class__name' ? '-from_class__name' : 'from_class__name'">
+                        <span class="group-hover:underline">FROM</span>
+                        <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'from_class__name'"></i>
+                        <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-from_class__name'"></i>
+                    </th>
+                    <th class="text-center space-x-1 hover:bg-white dark:hover:bg-slate-600 group" @click="sort = sort === 'to_class__name' ? '-to_class__name' : 'to_class__name'">
+                        <span class="group-hover:underline">TO</span>
+                        <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'to_class__name'"></i>
+                        <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-to_class__name'"></i>
+                    </th>
+                    <th class="text-center space-x-1 hover:bg-white dark:hover:bg-slate-600 group" @click="sort = sort === 'relationship_type' ? '-relationship_type' : 'relationship_type'">
+                        <span class="group-hover:underline">TYPE</span>
+                        <i class="fa-solid fa-sort-up h-4 w-4" x-show="sort === 'relationship_type'"></i>
+                        <i class="fa-solid fa-sort-down h-4 w-4" x-show="sort === '-relationship_type'"></i>
+                    </th>
                     {% endif %}
                     <th class="text-left space-x-1">ACTIONS</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for obj in object_list %}
-                <tr x-data="{ filterMatch: true }" x-show="filterMatch" x-init="$watch('filter', val => {filterMatch = false;})">
-                    {% if obj|has:"name" %}
-                    <td class="text-left" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.name }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.name }}</td>
-                    {% endif %}
-                    {% if obj|has:"description" %}
-                    <td class="text-left" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.description }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.description }}</td>
-                    {% endif %}
-                    {% if obj|has:"class_assoc_id" %}
-                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.class_assoc.name }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.class_assoc.name }}</td>
-                    {% endif %}
-                    {% if obj|is_instance:"Class|Relationship" %}
-                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{% if obj|has:'module'%}{{ obj.module.name }}{% elif obj|is_instance:'Relationship' %}{{ obj.from_class.module.name }}{% endif %}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{% if obj|has:"module" %}{{ obj.module.name }}{% elif obj|is_instance:"Relationship" %}{{ obj.from_class.module.name }}{% endif %}</td>
-                    {% endif %}
-                    {% if obj|is_instance:"Module|Class" %}
-                    <td class="text-left">
-                        <ul class="list-disc list-outside ml-4">
-                            {% if obj|has:"projects" %}
-                                {% for project in obj.projects.all %}
-                                <li x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ project.name }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ project.name }}</li>
-                                {% endfor %}
-                            {% elif obj|has:"module" %}
-                                {% for project in obj.module.projects.all %}
-                                <li x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ project.name }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ project.name }}</li>
-                                {% endfor %}
-                            {% endif %}
-                        </ul>
-                    </td>
-                    {% endif %}
-                    {% if obj|has:"visibility" %}
-                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.visibility }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.visibility }}</td>
-                    {% endif %}
-                    {% if obj|has:"data_type" %}
-                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.data_type }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.data_type }}</td>
-                    {% endif %}
-                    {% if obj|is_instance:"Method" %}
-                    <td class="text-left" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.arguments }}'.trim().toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.arguments }}</td>
-                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.return_type }}'.trim().toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.return_type }}</td>
-                    {% endif %}
-                    {% if obj|is_instance:"Relationship" %}
-                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.from_class.name }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.from_class.name }}</td>
-                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.to_class.name }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.to_class.name }}</td>
-                    <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if ('{{ obj.relationship_type }}'.toLowerCase().includes(filterVal)) {filterMatch = true}})">{{ obj.relationship_type }}</td>
-                    {% endif %}
-                    <td>
-                        <div class="w-full flex justify-start items-center space-x-2 md:space-x-3 xl:space-x-4">
-                            <a href="{% url detail_route pk=obj.id %}" class="btn-square primary">
-                                <i class="fa-solid fa-eye text-slate-200"></i>
-                            </a>
-                            <button class="btn-square red" @click="deletePK = '{{ obj.id }}'; showDelete = true">
-                                <i class="fa-solid fa-trash-can text-slate-200"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
+            <tbody x-init="$watch('sort', val => {
+                if (val[0] === '-') {
+                    object_list.reverse();
+                } else {
+                    object_list.sort((a, b) => {
+                        keys = val.split('__');
+                        if (keys.length === 1) {
+                            if (!a[keys[0]]) {
+                                return !b[keys[0]] ? 0 : -1;
+                            }
+                            if (!b[keys[0]]) {
+                                return 1;
+                            }
+                            if (typeof a[keys[0]] === 'string') {
+                                return a[keys[0]].localeCompare(b[keys[0]]);
+                            } else {
+                                a_arr = [];
+                                for (let i = 0; i < a[keys[0]].length; i++) {
+                                    a_arr.push(a[keys[0]][i].name);
+                                }
+                                a_arr.sort();
+                                b_arr = [];
+                                for (let i = 0; i < b[keys[0]].length; i++) {
+                                    b_arr.push(b[keys[0]][i].name);
+                                }
+                                b_arr.sort();
+                                return a_arr.toString().localeCompare(b_arr.toString());
+                            }
+                        } else if (keys.length === 2) {
+                            if (!a[keys[0]][keys[1]]) {
+                                return !b[keys[0]][keys[1]] ? 0 : -1;
+                            }
+                            if (!b[keys[0]][keys[1]]) {
+                                return 1;
+                            }
+                            if (typeof a[keys[0]][keys[1]] === 'string') {   
+                                return a[keys[0]][keys[1]].localeCompare(b[keys[0]][keys[1]]); 
+                            } else {
+                                a_arr = [];
+                                for (let i = 0; i < a[keys[0]][keys[1]].length; i++) {
+                                    a_arr.push(a[keys[0]][keys[1]][i].name);
+                                }
+                                a_arr.sort();
+                                b_arr = [];
+                                for (let i = 0; i < b[keys[0]][keys[1]].length; i++) {
+                                    b_arr.push(b[keys[0]][keys[1]][i].name);
+                                }
+                                b_arr.sort();
+                                return a_arr.toString().localeCompare(b_arr.toString());
+                            }
+                        } else if (keys.length === 3) {
+                            if (!a[keys[0]][keys[1]][keys[2]]) {
+                                return !b[keys[0]][keys[1]][keys[2]] ? 0 : -1;
+                            }
+                            if (!b[keys[0]][keys[1]][keys[2]]) {
+                                return 1;
+                            }
+                            if (typeof a[keys[0]][keys[1]][keys[2]] === 'string') {
+                                return a[keys[0]][keys[1]][keys[2]].localeCompare(b[keys[0]][keys[1]][keys[2]]); 
+                            } else {
+                                a_arr = [];
+                                for (let i = 0; i < a[keys[0]][keys[1]][keys[2]].length; i++) {
+                                    a_arr.push(a[keys[0]][keys[1]][keys[2]][i].name);
+                                }
+                                a_arr.sort();
+                                b_arr = [];
+                                for (let i = 0; i < b[keys[0]][keys[1]][keys[2]].length; i++) {
+                                    b_arr.push(b[keys[0]][keys[1]][keys[2]][i].name);
+                                }
+                                b_arr.sort();
+                                return a_arr.toString().localeCompare(b_arr.toString());
+                            }
+                        }
+                    });
+                }
+            })">
+                <template x-for="obj in object_list">
+                    <tr x-data="{ filterMatch: true }" x-show="filterMatch" x-init="$watch('filter', val => {filterMatch = false;})">
+                        <template x-if="Object.keys(obj).includes('name')">
+                            <td class="text-left" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if (obj.name?.toLowerCase().includes(filterVal)) {filterMatch = true}})" x-text="obj.name"></td>
+                        </template>
+                        <template x-if="Object.keys(obj).includes('description')">
+                            <td class="text-left" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if (obj.description?.toLowerCase().includes(filterVal)) {filterMatch = true}})" x-text="obj.description"></td>
+                        </template>
+                        <template x-if="Object.keys(obj).includes('class_assoc')">
+                            <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if (obj.class_assoc.name?.toLowerCase().includes(filterVal)) {filterMatch = true}})" x-text="obj.class_assoc.name"></td>
+                        </template>
+                        <template x-if="Object.keys(obj).includes('module') || Object.keys(obj).includes('from_class')">
+                            <td class="text-center" x-init="$watch('filter', val => {
+                                const filterVal = val.trim().toLowerCase(); 
+                                if (Object.keys(obj).includes('module')) {
+                                    if (obj.module.name?.toLowerCase().includes(filterVal)) {
+                                        filterMatch = true;
+                                    }
+                                }
+                                if (Object.keys(obj).includes('from_class')) {
+                                    if (obj.from_class.module.name?.toLowerCase().includes(filterVal)) {
+                                        filterMatch = true;
+                                    }
+                                }
+                            })" x-text="Object.keys(obj).includes('module') ? obj.module.name : obj.from_class.module.name"></td>
+                        </template>
+                        <template x-if="Object.keys(obj).includes('projects') || Object.keys(obj).includes('module')">
+                            <td class="text-left">
+                                <ul class="list-disc list-outside ml-4">
+                                    <template x-if="Object.keys(obj).includes('projects')">
+                                        <template x-for="project in obj.projects">
+                                            <li x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if (project.name?.toLowerCase().includes(filterVal)) {filterMatch = true}})" x-text="project.name"></li>
+                                        </template>
+                                    </template>
+                                    <template x-if="Object.keys(obj).includes('module')">
+                                        <template x-for="project in obj.module.projects">
+                                            <li x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if (project.name?.toLowerCase().includes(filterVal)) {filterMatch = true}})" x-text="project.name"></li>
+                                        </template>
+                                    </template>
+                                </ul>
+                            </td>
+                        </template>
+                        <template x-if="Object.keys(obj).includes('visibility')">
+                            <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if (obj.visibility?.toLowerCase().includes(filterVal)) {filterMatch = true}})" x-text="obj.visibility"></td>
+                        </template>
+                        <template x-if="Object.keys(obj).includes('data_type')">
+                            <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if (obj.data_type?.toLowerCase().includes(filterVal)) {filterMatch = true}})" x-text="obj.data_type"></td>
+                        </template>
+                        <template x-if="Object.keys(obj).includes('arguments')">
+                            <td class="text-left" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if (obj.arguments?.trim().toLowerCase().includes(filterVal)) {filterMatch = true}})" x-text="obj.arguments"></td>
+                        </template>
+                        <template x-if="Object.keys(obj).includes('return_type')">
+                            <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if (obj.return_type?.trim().toLowerCase().includes(filterVal)) {filterMatch = true}})" x-text="obj.return_type"></td>
+                        </template>
+                        <template x-if="Object.keys(obj).includes('from_class')">
+                            <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if (obj.from_class.name?.toLowerCase().includes(filterVal)) {filterMatch = true}})" x-text="obj.from_class.name"></td>
+                        </template>
+                        <template x-if="Object.keys(obj).includes('to_class')">
+                            <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if (obj.to_class.name?.toLowerCase().includes(filterVal)) {filterMatch = true}})"x-text="obj.to_class.name"></td>
+                        </template>
+                        <template x-if="Object.keys(obj).includes('relationship_type')">
+                            <td class="text-center" x-init="$watch('filter', val => {const filterVal = val.trim().toLowerCase(); if (obj.relationship_type?.toLowerCase().includes(filterVal)) {filterMatch = true}})" x-text="obj.relationship_type"></td>
+                        </template>
+                        <td>
+                            <div class="w-full flex justify-start items-center space-x-2 md:space-x-3 xl:space-x-4">
+                                <a href="" class="btn-square primary" x-init="() => {const objType = '{{ model_name }}'.toLowerCase(); $el.href = `/class-manager/${objType}/${obj.id}/detail/`}">
+                                    <i class="fa-solid fa-eye text-slate-200"></i>
+                                </a>
+                                <button class="btn-square red" @click="deletePK = obj.id; showDelete = true">
+                                    <i class="fa-solid fa-trash-can text-slate-200"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </template>
             </tbody>
         </table>
         <div class="bg-slate-500/15 backdrop-blur-sm fixed inset-0 z-50" x-show="showDelete" @click.self="showDelete = false">
